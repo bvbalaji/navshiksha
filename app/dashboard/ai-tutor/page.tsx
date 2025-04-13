@@ -1,190 +1,169 @@
 "use client"
 
-import { useState } from "react"
+import type React from "react"
+
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Brain, Send, Sparkles } from "lucide-react"
-import DashboardHeader from "@/components/dashboard-header"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Loader2, Send, Mic, MicOff } from "lucide-react"
 import { generateText } from "ai"
 import { openai } from "@ai-sdk/openai"
 
-export default function AITutorPage() {
-  const [messages, setMessages] = useState([
+interface Message {
+  role: "user" | "assistant"
+  content: string
+}
+
+export default function AITutor() {
+  const [input, setInput] = useState("")
+  const [messages, setMessages] = useState<Message[]>([
     {
-      role: "system",
-      content: "Welcome to your AI Tutor! I can help you learn any subject. What would you like to study today?",
+      role: "assistant",
+      content: "Hello! I'm your AI tutor. What would you like to learn today?",
     },
   ])
-  const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [subject, setSubject] = useState("math")
+  const [isRecording, setIsRecording] = useState(false)
+  const [subject, setSubject] = useState("General")
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const handleSend = async () => {
-    if (!input.trim()) return
+  // Scroll to bottom of messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
 
-    const userMessage = {
-      role: "user",
-      content: input,
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (input.trim() === "") return
 
-    setMessages((prev) => [...prev, userMessage])
+    const userMessage = input
     setInput("")
+
+    // Add user message to chat
+    setMessages((prev) => [...prev, { role: "user", content: userMessage }])
     setIsLoading(true)
 
     try {
+      // Use AI SDK to generate response
       const { text } = await generateText({
         model: openai("gpt-4o"),
-        prompt: input,
-        system: `You are an expert tutor in ${subject}. Provide clear, concise explanations tailored to the student's level. Include examples and ask questions to check understanding.`,
+        prompt: `You are a helpful tutor specializing in ${subject}. 
+                The student asks: ${userMessage}
+                Provide a clear, educational response that helps them understand the topic better.`,
+        maxTokens: 500,
       })
 
-      const aiMessage = {
-        role: "assistant",
-        content: text,
-      }
-
-      setMessages((prev) => [...prev, aiMessage])
+      // Add AI response to chat
+      setMessages((prev) => [...prev, { role: "assistant", content: text }])
     } catch (error) {
       console.error("Error generating response:", error)
-      const errorMessage = {
-        role: "assistant",
-        content: "Sorry, I encountered an error. Please try again.",
-      }
-      setMessages((prev) => [...prev, errorMessage])
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "Sorry, I encountered an error. Please try again." },
+      ])
     } finally {
       setIsLoading(false)
     }
   }
 
+  const toggleRecording = () => {
+    // This would integrate with Web Speech API in a real implementation
+    setIsRecording(!isRecording)
+    if (!isRecording) {
+      // Start recording logic
+    } else {
+      // Stop recording and process audio
+      setInput("This is a simulated voice input")
+    }
+  }
+
   return (
-    <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1">
-        <aside className="hidden w-64 flex-col border-r bg-muted/40 lg:flex">
-          <div className="flex h-14 items-center border-b px-4">
-            <span className="font-semibold">AI Tutor</span>
-          </div>
-          <div className="p-4">
-            <h3 className="mb-2 text-sm font-medium">Select Subject</h3>
-            <Tabs value={subject} onValueChange={setSubject} className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="math">Math</TabsTrigger>
-                <TabsTrigger value="science">Science</TabsTrigger>
-              </TabsList>
-              <TabsList className="mt-2 grid w-full grid-cols-2">
-                <TabsTrigger value="history">History</TabsTrigger>
-                <TabsTrigger value="english">English</TabsTrigger>
-              </TabsList>
-            </Tabs>
-
-            <div className="mt-6">
-              <h3 className="mb-2 text-sm font-medium">Learning Level</h3>
-              <select className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                <option>Beginner</option>
-                <option>Intermediate</option>
-                <option>Advanced</option>
-              </select>
-            </div>
-
-            <div className="mt-6">
-              <h3 className="mb-2 text-sm font-medium">Suggested Topics</h3>
+    <div className="container mx-auto py-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="md:col-span-1">
+          <Card>
+            <CardHeader>
+              <CardTitle>Study Topics</CardTitle>
+            </CardHeader>
+            <CardContent>
               <div className="space-y-2">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => setInput("Explain the Pythagorean theorem")}
-                >
-                  <Sparkles className="mr-2 h-4 w-4 text-primary" />
-                  Pythagorean theorem
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => setInput("Help me understand quadratic equations")}
-                >
-                  <Sparkles className="mr-2 h-4 w-4 text-primary" />
-                  Quadratic equations
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => setInput("What are the properties of logarithms?")}
-                >
-                  <Sparkles className="mr-2 h-4 w-4 text-primary" />
-                  Logarithm properties
-                </Button>
-              </div>
-            </div>
-          </div>
-        </aside>
-        <main className="flex flex-1 flex-col">
-          <div className="flex flex-1 flex-col">
-            <div className="flex-1 overflow-auto p-4">
-              <div className="mx-auto max-w-3xl space-y-4">
-                {messages.map((message, index) => (
-                  <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <Card
-                      className={`max-w-[80%] ${message.role === "user" ? "bg-primary text-primary-foreground" : ""}`}
-                    >
-                      <CardContent className="p-3">
-                        {message.role === "assistant" && (
-                          <div className="mb-2 flex items-center gap-2">
-                            <Brain className="h-4 w-4" />
-                            <span className="text-xs font-medium">AI Tutor</span>
-                          </div>
-                        )}
-                        <p className="text-sm">{message.content}</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                ))}
-                {isLoading && (
-                  <div className="flex justify-start">
-                    <Card>
-                      <CardContent className="p-3">
-                        <div className="mb-2 flex items-center gap-2">
-                          <Brain className="h-4 w-4" />
-                          <span className="text-xs font-medium">AI Tutor</span>
-                        </div>
-                        <p className="text-sm">Thinking...</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="border-t p-4">
-              <div className="mx-auto max-w-3xl">
-                <div className="flex items-end gap-2">
-                  <Textarea
-                    placeholder="Ask anything about your studies..."
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    className="min-h-24 resize-none"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault()
-                        handleSend()
-                      }
-                    }}
-                  />
-                  <Button size="icon" onClick={handleSend} disabled={isLoading || !input.trim()}>
-                    <Send className="h-4 w-4" />
-                    <span className="sr-only">Send</span>
+                {["Mathematics", "Science", "History", "Language", "Computer Science", "General"].map((topic) => (
+                  <Button
+                    key={topic}
+                    variant={subject === topic ? "default" : "outline"}
+                    className="w-full justify-start"
+                    onClick={() => setSubject(topic)}
+                  >
+                    {topic}
                   </Button>
-                </div>
-                <p className="mt-2 text-xs text-gray-500">
-                  Your AI tutor is here to help with personalized learning. Ask questions, request explanations, or get
-                  help with problems.
-                </p>
+                ))}
               </div>
-            </div>
-          </div>
-        </main>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="md:col-span-3">
+          <Card className="h-[calc(100vh-8rem)] flex flex-col">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Avatar className="h-8 w-8 mr-2">
+                  <AvatarImage src="/placeholder-logo.svg" alt="AI" />
+                  <AvatarFallback>AI</AvatarFallback>
+                </Avatar>
+                AI Tutor - {subject}
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent className="flex-grow overflow-hidden">
+              <ScrollArea className="h-[calc(100vh-16rem)]">
+                <div className="space-y-4 p-4">
+                  {messages.map((message, index) => (
+                    <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                      <div
+                        className={`rounded-lg px-4 py-2 max-w-[80%] ${
+                          message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
+                        }`}
+                      >
+                        {message.content}
+                      </div>
+                    </div>
+                  ))}
+                  {isLoading && (
+                    <div className="flex justify-start">
+                      <div className="rounded-lg px-4 py-2 bg-muted flex items-center space-x-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Thinking...</span>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+              </ScrollArea>
+            </CardContent>
+
+            <CardFooter>
+              <form onSubmit={handleSubmit} className="flex w-full space-x-2">
+                <Button type="button" size="icon" variant="outline" onClick={toggleRecording}>
+                  {isRecording ? <MicOff className="h-4 w-4 text-red-500" /> : <Mic className="h-4 w-4" />}
+                </Button>
+                <Input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask your question..."
+                  className="flex-grow"
+                  disabled={isLoading}
+                />
+                <Button type="submit" disabled={isLoading || input.trim() === ""}>
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                </Button>
+              </form>
+            </CardFooter>
+          </Card>
+        </div>
       </div>
     </div>
   )
 }
-
