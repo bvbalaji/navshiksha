@@ -37,7 +37,7 @@ function ProgressItem({ title, progress, lastActivity, badges }: ProgressItemPro
   )
 }
 
-export default function LearningProgress() {
+export function LearningProgress() {
   const [activeTab, setActiveTab] = useState("courses")
 
   // Mock data
