@@ -1,166 +1,243 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BookOpen, Brain, FileText, LayoutDashboard, LineChart, Settings, Users } from "lucide-react"
+"use client"
+
+import { useState } from "react"
 import Link from "next/link"
-import DashboardHeader from "@/components/dashboard-header"
-import RecentActivity from "@/components/recent-activity"
-import LearningProgress from "@/components/learning-progress"
-import RecommendedCourses from "@/components/recommended-courses"
-import { redirect } from "next/navigation"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/lib/auth-options"
+import { Brain, BookOpen, BarChart, Settings, LogOut, Menu } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
-export default async function DashboardPage() {
-  const session = await getServerSession(authOptions)
+export default function Dashboard() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  if (!session) {
-    redirect("/login")
-  }
-
-  // Redirect teachers to their dashboard
-  // This is a backup check in case middleware didn't handle it
-  if (session.user.role === "teacher") {
-    redirect("/dashboard/teacher")
-  }
-
-  // Student dashboard content
   return (
     <div className="flex min-h-screen flex-col">
-      <DashboardHeader />
-      <div className="flex flex-1">
-        <aside className="hidden w-64 flex-col border-r bg-muted/40 lg:flex">
-          <div className="flex h-14 items-center border-b px-4">
-            <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-              <Brain className="h-5 w-5 text-primary" />
-              <span>Naviksha</span>
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center">
+          <div className="mr-4 flex items-center gap-2 md:hidden">
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="md:hidden">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[240px] sm:w-[300px]">
+                <div className="flex h-full flex-col">
+                  <div className="flex items-center gap-2 py-4">
+                    <Brain className="h-5 w-5 text-primary" />
+                    <span className="text-lg font-bold">Navshiksha</span>
+                  </div>
+                  <nav className="flex-1 space-y-2 py-4">
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-muted"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <BookOpen className="h-4 w-4" />
+                      My Learning
+                    </Link>
+                    <Link
+                      href="/dashboard/progress"
+                      className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <BarChart className="h-4 w-4" />
+                      Progress
+                    </Link>
+                    <Link
+                      href="/dashboard/settings"
+                      className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Settings className="h-4 w-4" />
+                      Settings
+                    </Link>
+                  </nav>
+                  <div className="border-t py-4">
+                    <Button variant="ghost" className="w-full justify-start gap-2 text-muted-foreground">
+                      <LogOut className="h-4 w-4" />
+                      Log out
+                    </Button>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+          <div className="flex items-center gap-2 text-primary">
+            <Brain className="h-5 w-5" />
+            <span className="text-lg font-bold">Navshiksha</span>
+          </div>
+          <nav className="hidden md:ml-8 md:flex md:items-center md:gap-6">
+            <Link href="/dashboard" className="text-sm font-medium">
+              My Learning
             </Link>
-          </div>
-          <nav className="flex-1 overflow-auto py-4">
-            <div className="px-4 py-2">
-              <h2 className="mb-2 text-xs font-semibold text-gray-500">Dashboard</h2>
-              <div className="space-y-1">
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-3 rounded-md bg-primary/10 px-3 py-2 text-sm font-medium text-primary"
-                >
-                  <LayoutDashboard className="h-4 w-4" />
-                  Overview
-                </Link>
-                <Link
-                  href="/dashboard/courses"
-                  className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900"
-                >
-                  <BookOpen className="h-4 w-4" />
-                  My Courses
-                </Link>
-                <Link
-                  href="/dashboard/progress"
-                  className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900"
-                >
-                  <LineChart className="h-4 w-4" />
-                  Progress
-                </Link>
-              </div>
-            </div>
-            <div className="px-4 py-2">
-              <h2 className="mb-2 text-xs font-semibold text-gray-500">Learning</h2>
-              <div className="space-y-1">
-                <Link
-                  href="/dashboard/discover"
-                  className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900"
-                >
-                  <FileText className="h-4 w-4" />
-                  Discover
-                </Link>
-                <Link
-                  href="/dashboard/ai-tutor"
-                  className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900"
-                >
-                  <Brain className="h-4 w-4" />
-                  AI Tutor
-                </Link>
-              </div>
-            </div>
-            <div className="px-4 py-2">
-              <h2 className="mb-2 text-xs font-semibold text-gray-500">Account</h2>
-              <div className="space-y-1">
-                <Link
-                  href="/dashboard/profile"
-                  className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900"
-                >
-                  <Users className="h-4 w-4" />
-                  Profile
-                </Link>
-                <Link
-                  href="/dashboard/settings"
-                  className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900"
-                >
-                  <Settings className="h-4 w-4" />
-                  Settings
-                </Link>
-              </div>
-            </div>
+            <Link href="/dashboard/progress" className="text-sm font-medium text-muted-foreground">
+              Progress
+            </Link>
+            <Link href="/dashboard/settings" className="text-sm font-medium text-muted-foreground">
+              Settings
+            </Link>
           </nav>
-        </aside>
-        <main className="flex-1 overflow-auto">
-          <div className="container max-w-6xl py-6">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold">Welcome back, {session.user.name?.split(" ")[0] || "Student"}</h1>
-              <p className="text-gray-500">Here's an overview of your learning journey</p>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Courses in Progress</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">3</div>
-                  <p className="text-xs text-gray-500">2 courses ahead of schedule</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Learning Streak</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">7 days</div>
-                  <p className="text-xs text-gray-500">Keep it up!</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Achievements</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">12</div>
-                  <p className="text-xs text-gray-500">2 new this week</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="mt-6">
-              <Tabs defaultValue="progress">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="progress">Learning Progress</TabsTrigger>
-                  <TabsTrigger value="recommended">Recommended</TabsTrigger>
-                  <TabsTrigger value="activity">Recent Activity</TabsTrigger>
-                </TabsList>
-                <TabsContent value="progress" className="mt-4">
-                  <LearningProgress />
-                </TabsContent>
-                <TabsContent value="recommended" className="mt-4">
-                  <RecommendedCourses />
-                </TabsContent>
-                <TabsContent value="activity" className="mt-4">
-                  <RecentActivity />
-                </TabsContent>
-              </Tabs>
-            </div>
+          <div className="ml-auto flex items-center gap-4">
+            <Button variant="outline" size="sm">
+              <LogOut className="mr-2 h-4 w-4" />
+              Log out
+            </Button>
           </div>
-        </main>
-      </div>
+        </div>
+      </header>
+      <main className="flex-1 py-8">
+        <div className="container">
+          <div className="mb-8 flex flex-col gap-2">
+            <h1 className="text-3xl font-bold">Welcome back, Student</h1>
+            <p className="text-muted-foreground">Continue your learning journey where you left off.</p>
+          </div>
+          <Tabs defaultValue="current">
+            <TabsList className="mb-6">
+              <TabsTrigger value="current">Current Courses</TabsTrigger>
+              <TabsTrigger value="recommended">Recommended</TabsTrigger>
+              <TabsTrigger value="completed">Completed</TabsTrigger>
+            </TabsList>
+            <TabsContent value="current" className="space-y-6">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {currentCourses.map((course) => (
+                  <Card key={course.id}>
+                    <CardHeader className="pb-2">
+                      <CardTitle>{course.title}</CardTitle>
+                      <CardDescription>{course.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span>Progress</span>
+                            <span className="font-medium">{course.progress}%</span>
+                          </div>
+                          <Progress value={course.progress} />
+                        </div>
+                        <div className="flex justify-between">
+                          <Button variant="outline" size="sm">
+                            View Details
+                          </Button>
+                          <Button size="sm">Continue</Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+            <TabsContent value="recommended" className="space-y-6">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {recommendedCourses.map((course) => (
+                  <Card key={course.id}>
+                    <CardHeader>
+                      <CardTitle>{course.title}</CardTitle>
+                      <CardDescription>{course.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">{course.duration}</span>
+                        <span className="text-sm font-medium">{course.level}</span>
+                      </div>
+                      <Button className="mt-4 w-full">Enroll Now</Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+            <TabsContent value="completed" className="space-y-6">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {completedCourses.map((course) => (
+                  <Card key={course.id}>
+                    <CardHeader>
+                      <CardTitle>{course.title}</CardTitle>
+                      <CardDescription>{course.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Completed on {course.completedDate}</span>
+                        <span className="text-sm font-medium text-green-500">100%</span>
+                      </div>
+                      <div className="mt-4 flex justify-between">
+                        <Button variant="outline" size="sm">
+                          View Certificate
+                        </Button>
+                        <Button variant="secondary" size="sm">
+                          Review
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </main>
     </div>
   )
 }
 
+const currentCourses = [
+  {
+    id: 1,
+    title: "Algebra Fundamentals",
+    description: "Master the basics of algebraic equations and expressions",
+    progress: 65,
+  },
+  {
+    id: 2,
+    title: "Physics: Mechanics",
+    description: "Learn about forces, motion, and energy in physical systems",
+    progress: 42,
+  },
+  {
+    id: 3,
+    title: "English Literature",
+    description: "Analyze classic works and develop critical reading skills",
+    progress: 78,
+  },
+]
+
+const recommendedCourses = [
+  {
+    id: 4,
+    title: "Calculus I",
+    description: "Introduction to differential calculus and its applications",
+    duration: "8 weeks",
+    level: "Intermediate",
+  },
+  {
+    id: 5,
+    title: "Chemistry Basics",
+    description: "Explore atoms, molecules, and chemical reactions",
+    duration: "6 weeks",
+    level: "Beginner",
+  },
+  {
+    id: 6,
+    title: "World History",
+    description: "Survey of major historical events and civilizations",
+    duration: "10 weeks",
+    level: "All levels",
+  },
+]
+
+const completedCourses = [
+  {
+    id: 7,
+    title: "Pre-Algebra",
+    description: "Foundation for algebraic concepts and problem-solving",
+    completedDate: "Mar 15, 2023",
+  },
+  {
+    id: 8,
+    title: "Biology: Cells",
+    description: "Study of cell structure, function, and processes",
+    completedDate: "Jan 22, 2023",
+  },
+]
