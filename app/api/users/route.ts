@@ -9,7 +9,7 @@ export async function GET() {
         name: true,
         email: true,
         role: true,
-        createdAt: true,
+        created_at: true,
       },
     })
 

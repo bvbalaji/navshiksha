@@ -8,10 +8,10 @@ export default async function UsersPage() {
       name: true,
       email: true,
       role: true,
-      createdAt: true,
+      created_at: true,
     },
     orderBy: {
-      createdAt: "desc",
+      created_at: "desc",
     },
   })
 
@@ -52,7 +52,7 @@ export default async function UsersPage() {
                         {user.role}
                       </span>
                     </td>
-                    <td className="py-3 px-4">{new Date(user.createdAt).toLocaleDateString()}</td>
+                    <td className="py-3 px-4">{new Date(user.created_at).toLocaleDateString()}</td>
                   </tr>
                 ))}
               </tbody>
