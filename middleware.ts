@@ -1,79 +1,39 @@
 import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
 import { getToken } from "next-auth/jwt"
+import type { NextRequest } from "next/server"
 
+// This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Skip middleware processing for API routes and static assets
-  if (pathname.startsWith("/api") || pathname.startsWith("/_next") || pathname.includes(".")) {
-    return NextResponse.next()
+  // Get the token and check if the user is authenticated
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
+  const isAuthenticated = !!token
+
+  // Define auth pages (login, register, etc.)
+  const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/register")
+
+  // If on an auth page and already authenticated, redirect to dashboard
+  if (isAuthPage && isAuthenticated) {
+    return NextResponse.redirect(new URL("/dashboard", request.url))
   }
 
-  console.log(`Middleware processing: ${pathname}`)
+  // If on a protected page and not authenticated, redirect to login
+  const isProtectedRoute =
+    pathname.startsWith("/dashboard") || pathname.startsWith("/admin") || pathname.startsWith("/tutor")
 
-  try {
-    // Get the session token
-    const token = await getToken({
-      req: request,
-      secret: process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET,
-    })
-
-    // For debugging
-    console.log(`Path: ${pathname}, Token:`, token ? `Found for ${token.email} with role ${token.role}` : "Not found")
-
-    // If no token and trying to access protected route, redirect to login
-    if (!token && pathname.startsWith("/dashboard")) {
-      console.log(`Redirecting to login from ${pathname} - no token`)
-      return NextResponse.redirect(new URL("/login", request.url))
-    }
-
-    // If has token and trying to access auth routes, redirect to appropriate dashboard
-    if (token && (pathname === "/login" || pathname === "/signup")) {
-      console.log(`Redirecting from ${pathname} to dashboard - user is authenticated`)
-
-      // Redirect based on role
-      if (token.role === "teacher") {
-        return NextResponse.redirect(new URL("/dashboard/teacher", request.url))
-      } else {
-        return NextResponse.redirect(new URL("/dashboard", request.url))
-      }
-    }
-
-    // IMPORTANT: Only apply role-based redirects for the exact dashboard paths
-    // to prevent redirect loops with nested routes
-    if (token) {
-      // Teacher trying to access student dashboard root
-      if (pathname === "/dashboard" && token.role === "teacher") {
-        console.log(`Teacher accessing student dashboard, redirecting to teacher dashboard`)
-        return NextResponse.redirect(new URL("/dashboard/teacher", request.url))
-      }
-
-      // Student trying to access teacher dashboard root
-      if (pathname === "/dashboard/teacher" && token.role === "student") {
-        console.log(`Student accessing teacher dashboard, redirecting to student dashboard`)
-        return NextResponse.redirect(new URL("/dashboard", request.url))
-      }
-    }
-  } catch (error) {
-    console.error("Middleware error:", error)
-    // If there's an error, allow the request to proceed
+  if (isProtectedRoute && !isAuthenticated) {
+    // Store the original URL to redirect back after login
+    const url = new URL("/login", request.url)
+    url.searchParams.set("callbackUrl", pathname)
+    return NextResponse.redirect(url)
   }
 
+  // For all other cases, continue
   return NextResponse.next()
 }
 
-// Configure which routes the middleware runs on
+// Specify which routes to apply the middleware to
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/dashboard/:path*", "/admin/:path*", "/tutor/:path*", "/login", "/register"],
 }
-

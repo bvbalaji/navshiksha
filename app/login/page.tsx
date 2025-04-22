@@ -3,136 +3,113 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { signIn, useSession } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { signIn, useSession } from "next-auth/react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Brain } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { z } from "zod"
-
-// Login schema for client-side validation
-const LoginSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters" }),
-})
+import { Brain } from "lucide-react"
 
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { data: session, status } = useSession()
-  const [isLoading, setIsLoading] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string[]>>({})
-  const [generalError, setGeneralError] = useState<string | null>(null)
-  const [redirectAttempted, setRedirectAttempted] = useState(false)
-
-  // Get error from URL if present
-  const urlError = searchParams.get("error")
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
+  const { status } = useSession()
 
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+
+  // If already authenticated, redirect to dashboard
   useEffect(() => {
-    if (urlError) {
-      if (urlError === "CredentialsSignin") {
-        setGeneralError("Invalid email or password")
-      } else if (urlError === "unauthenticated") {
-        setGeneralError("Please log in to access this page")
+    if (status === "authenticated") {
+      router.push("/dashboard")
+    }
+  }, [status, router])
+
+  // Check for error or success messages from URL parameters
+  useEffect(() => {
+    const errorParam = searchParams.get("error")
+    if (errorParam) {
+      if (errorParam === "CredentialsSignin") {
+        setError("Invalid email or password")
       } else {
-        setGeneralError(`Authentication error: ${urlError}`)
+        setError(`An error occurred during sign in: ${errorParam}`)
       }
     }
-  }, [urlError])
 
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (status === "authenticated" && !redirectAttempted) {
-      setRedirectAttempted(true)
-      console.log("User is authenticated, redirecting to appropriate dashboard")
-
-      // Redirect based on role
-      if (session.user.role === "teacher") {
-        router.push("/dashboard/teacher")
-      } else {
-        router.push("/dashboard")
-      }
+    // Check if user just registered
+    const registered = searchParams.get("registered")
+    if (registered === "true") {
+      setSuccess("Account created successfully! You can now log in.")
     }
-  }, [status, session, router, redirectAttempted])
+  }, [searchParams])
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError("")
+    setSuccess("")
     setIsLoading(true)
-    setErrors({})
-    setGeneralError(null)
-
-    const formData = new FormData(e.currentTarget)
-    const email = formData.get("email") as string
-    const password = formData.get("password") as string
-
-    // Validate form data
-    const validationResult = LoginSchema.safeParse({ email, password })
-
-    if (!validationResult.success) {
-      setErrors(validationResult.error.flatten().fieldErrors)
-      setIsLoading(false)
-      return
-    }
 
     try {
-      console.log("Attempting to sign in with", email)
-
-      // Sign in with NextAuth
       const result = await signIn("credentials", {
+        redirect: false,
         email,
         password,
-        redirect: false,
       })
 
-      console.log("Sign in result:", result)
-
       if (result?.error) {
-        setGeneralError("Invalid email or password")
+        setError(result.error === "CredentialsSignin" ? "Invalid email or password" : result.error)
         setIsLoading(false)
-        return
-      }
-
-      if (result?.ok) {
-        console.log("Login successful, refreshing...")
-        // Let the useEffect handle the redirect based on role
-        router.refresh()
+      } else {
+        router.push(callbackUrl)
       }
     } catch (error) {
       console.error("Login error:", error)
-      setGeneralError("An unexpected error occurred. Please try again.")
+      setError("An unexpected error occurred. Please try again.")
       setIsLoading(false)
     }
   }
 
-  // If already authenticated, show loading state
-  if (status === "authenticated") {
+  // If checking authentication status, show loading
+  if (status === "loading") {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p>Redirecting to dashboard...</p>
+        <p>Loading...</p>
       </div>
     )
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <div className="flex flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <div className="flex justify-center">
-            <Link href="/">
-              <Brain className="h-10 w-10 text-primary" />
-            </Link>
-          </div>
-          <h2 className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight">Sign in to your account</h2>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="flex justify-center">
+          <Brain className="h-12 w-12 text-primary" />
         </div>
+        <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">Sign in to Navshiksha</h2>
+        <p className="mt-2 text-center text-sm text-gray-600">
+          Or{" "}
+          <Link href="/register" className="font-medium text-primary hover:text-primary/90">
+            create a new account
+          </Link>
+        </p>
+      </div>
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          {generalError && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{generalError}</AlertDescription>
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10">
+          {error && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {success && (
+            <Alert className="mb-6 border-green-500 bg-green-50">
+              <AlertDescription className="text-green-800">{success}</AlertDescription>
             </Alert>
           )}
 
@@ -146,13 +123,10 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   required
-                  aria-describedby="email-error"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="block w-full"
                 />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-500" id="email-error">
-                    {errors.email[0]}
-                  </p>
-                )}
               </div>
             </div>
 
@@ -160,8 +134,8 @@ export default function LoginPage() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
                 <div className="text-sm">
-                  <Link href="/forgot-password" className="font-semibold text-primary hover:text-primary/80">
-                    Forgot password?
+                  <Link href="/forgot-password" className="font-medium text-primary hover:text-primary/90">
+                    Forgot your password?
                   </Link>
                 </div>
               </div>
@@ -172,13 +146,10 @@ export default function LoginPage() {
                   type="password"
                   autoComplete="current-password"
                   required
-                  aria-describedby="password-error"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="block w-full"
                 />
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-500" id="password-error">
-                    {errors.password[0]}
-                  </p>
-                )}
               </div>
             </div>
 
@@ -189,15 +160,20 @@ export default function LoginPage() {
             </div>
           </form>
 
-          <p className="mt-10 text-center text-sm text-gray-500">
-            Not a member?{" "}
-            <Link href="/signup" className="font-semibold leading-6 text-primary hover:text-primary/80">
-              Sign up for free
-            </Link>
-          </p>
+          {process.env.NODE_ENV === "development" && (
+            <div className="mt-6 rounded-md border border-yellow-200 bg-yellow-50 p-4">
+              <h3 className="text-sm font-medium text-yellow-800">Development Mode</h3>
+              <p className="mt-2 text-sm text-yellow-700">
+                Create a new account using the registration page or use these test credentials:
+              </p>
+              <div className="mt-2 text-sm text-yellow-700">
+                <div>Email: student@navshiksha.com</div>
+                <div>Password: password123</div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
   )
 }
-

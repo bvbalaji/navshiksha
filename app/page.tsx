@@ -1,7 +1,9 @@
 import Link from "next/link"
-import { ArrowRight, BookOpen, Brain, Lightbulb, Sparkles } from "lucide-react"
+import { BookOpen, Brain, Lightbulb, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { NavButtons } from "@/components/nav-buttons"
+import { HeroButtons } from "@/components/hero-buttons"
 
 export default function Home() {
   return (
@@ -32,10 +34,7 @@ export default function Home() {
               >
                 About
               </Link>
-              <Button variant="outline" size="sm" className="mr-2">
-                Log in
-              </Button>
-              <Button size="sm">Get Started</Button>
+              <NavButtons />
             </nav>
           </div>
         </div>
@@ -45,22 +44,17 @@ export default function Home() {
           <div className="container px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
               <div className="flex flex-col justify-center space-y-4">
-                <div className="space-y-2">
-                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                    Personalized AI Tutoring for Every Student
-                  </h1>
-                  <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                    Learn at your own pace with our AI-powered tutoring platform. Adaptive learning paths tailored to
-                    your unique needs.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Button size="lg" className="gap-1.5">
-                    Start Learning <ArrowRight className="h-4 w-4" />
-                  </Button>
-                  <Button size="lg" variant="outline">
-                    Explore Subjects
-                  </Button>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
+                      Personalized AI Tutoring for Every Student
+                    </h1>
+                    <p className="max-w-[600px] text-muted-foreground md:text-xl">
+                      Learn at your own pace with our AI-powered tutoring platform. Adaptive learning paths tailored to
+                      your unique needs.
+                    </p>
+                  </div>
+                  <HeroButtons />
                 </div>
               </div>
               <div className="flex items-center justify-center">
