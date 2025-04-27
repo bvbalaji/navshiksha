@@ -25,12 +25,14 @@ export function LogoutButton({
   const handleLogout = async () => {
     try {
       setIsLoading(true)
-      await signOut({ redirect: false })
-      router.push(redirectPath)
-      router.refresh() // Force a refresh to update the UI
+      // Use the redirect option instead of handling navigation manually
+      await signOut({
+        callbackUrl: redirectPath,
+        redirect: true,
+      })
+      // The redirect will be handled by NextAuth, so we don't need to use router.push
     } catch (error) {
       console.error("Logout error:", error)
-    } finally {
       setIsLoading(false)
     }
   }

@@ -29,6 +29,7 @@ export const authOptions = {
   ],
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -53,6 +54,12 @@ export const authOptions = {
   },
   debug: process.env.NODE_ENV === "development",
   secret: process.env.NEXTAUTH_SECRET,
+  events: {
+    async signOut({ token }) {
+      // You can add custom logic here if needed when a user signs out
+      console.log("User signed out:", token?.email)
+    },
+  },
 }
 
 const handler = NextAuth(authOptions)
