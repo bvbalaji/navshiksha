@@ -1,7 +1,7 @@
 import type React from "react"
 import { requireAuth } from "@/lib/auth-utils"
 
-export default async function DashboardLayout({
+export default async function TutorLayout({
   children,
 }: {
   children: React.ReactNode

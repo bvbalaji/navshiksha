@@ -2,15 +2,35 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Brain, BookOpen, BarChart, Settings, LogOut, Menu } from "lucide-react"
+import { useSession } from "next-auth/react"
+import { Brain, BookOpen, BarChart, Settings, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { LogoutButton } from "@/components/logout-button"
+import { redirect } from "next/navigation"
 
 export default function Dashboard() {
+  const { data: session, status } = useSession()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  // Protect the dashboard - redirect if not authenticated
+  if (status === "unauthenticated") {
+    redirect("/login")
+  }
+
+  // Show loading state while checking session
+  if (status === "loading") {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    )
+  }
+
+  const userName = session?.user?.name || "Student"
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -57,10 +77,7 @@ export default function Dashboard() {
                     </Link>
                   </nav>
                   <div className="border-t py-4">
-                    <Button variant="ghost" className="w-full justify-start gap-2 text-muted-foreground">
-                      <LogOut className="h-4 w-4" />
-                      Log out
-                    </Button>
+                    <LogoutButton variant="ghost" className="w-full justify-start" />
                   </div>
                 </div>
               </SheetContent>
@@ -82,21 +99,18 @@ export default function Dashboard() {
             </Link>
           </nav>
           <div className="ml-auto flex items-center gap-4">
-            <Button variant="outline" size="sm">
-              <LogOut className="mr-2 h-4 w-4" />
-              Log out
-            </Button>
+            <LogoutButton />
           </div>
         </div>
       </header>
       <main className="flex-1 py-8">
-        <div className="container">
+        <div className="container px-4 md:px-6">
           <div className="mb-8 flex flex-col gap-2">
-            <h1 className="text-3xl font-bold">Welcome back, Student</h1>
+            <h1 className="text-3xl font-bold">Welcome back, {userName}</h1>
             <p className="text-muted-foreground">Continue your learning journey where you left off.</p>
           </div>
           <Tabs defaultValue="current">
-            <TabsList className="mb-6">
+            <TabsList className="mb-6 w-full overflow-x-auto">
               <TabsTrigger value="current">Current Courses</TabsTrigger>
               <TabsTrigger value="recommended">Recommended</TabsTrigger>
               <TabsTrigger value="completed">Completed</TabsTrigger>
@@ -104,12 +118,12 @@ export default function Dashboard() {
             <TabsContent value="current" className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {currentCourses.map((course) => (
-                  <Card key={course.id}>
+                  <Card key={course.id} className="flex flex-col">
                     <CardHeader className="pb-2">
                       <CardTitle>{course.title}</CardTitle>
                       <CardDescription>{course.description}</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-1">
                       <div className="space-y-4">
                         <div className="space-y-2">
                           <div className="flex items-center justify-between text-sm">
@@ -133,12 +147,12 @@ export default function Dashboard() {
             <TabsContent value="recommended" className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {recommendedCourses.map((course) => (
-                  <Card key={course.id}>
+                  <Card key={course.id} className="flex flex-col">
                     <CardHeader>
                       <CardTitle>{course.title}</CardTitle>
                       <CardDescription>{course.description}</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-1">
                       <div className="flex justify-between">
                         <span className="text-sm text-muted-foreground">{course.duration}</span>
                         <span className="text-sm font-medium">{course.level}</span>
@@ -152,12 +166,12 @@ export default function Dashboard() {
             <TabsContent value="completed" className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {completedCourses.map((course) => (
-                  <Card key={course.id}>
+                  <Card key={course.id} className="flex flex-col">
                     <CardHeader>
                       <CardTitle>{course.title}</CardTitle>
                       <CardDescription>{course.description}</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-1">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">Completed on {course.completedDate}</span>
                         <span className="text-sm font-medium text-green-500">100%</span>

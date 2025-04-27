@@ -1,14 +1,18 @@
 "use client"
 
 import { useState } from "react"
+import { useSession } from "next-auth/react"
 import { Send, Sparkles, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
+import { redirect } from "next/navigation"
+import { LogoutButton } from "@/components/logout-button"
 
 export default function TutorPage() {
+  const { data: session, status } = useSession()
   const [messages, setMessages] = useState([
     {
       role: "system",
@@ -17,6 +21,20 @@ export default function TutorPage() {
   ])
   const [inputValue, setInputValue] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+
+  // Protect the tutor page - redirect if not authenticated
+  if (status === "unauthenticated") {
+    redirect("/login")
+  }
+
+  // Show loading state while checking session
+  if (status === "loading") {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    )
+  }
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return
@@ -81,6 +99,7 @@ export default function TutorPage() {
                 <TabsTrigger value="exercises">Exercises</TabsTrigger>
               </TabsList>
             </Tabs>
+            <LogoutButton />
           </div>
         </div>
       </header>
