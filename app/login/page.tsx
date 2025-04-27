@@ -56,17 +56,25 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
+      console.log("Attempting to sign in with:", { email, callbackUrl })
+
       const result = await signIn("credentials", {
         redirect: false,
         email,
         password,
       })
 
+      console.log("Sign in result:", result)
+
       if (result?.error) {
         setError(result.error === "CredentialsSignin" ? "Invalid email or password" : result.error)
         setIsLoading(false)
-      } else {
+      } else if (result?.url) {
+        // Use router.push for client-side navigation
         router.push(callbackUrl)
+      } else {
+        // Fallback if no URL is returned
+        router.push("/dashboard")
       }
     } catch (error) {
       console.error("Login error:", error)

@@ -1,4 +1,4 @@
-import { streamText } from "ai"
+import { streamUI } from "ai"
 import { openai } from "@ai-sdk/openai"
 
 // Allow streaming responses up to 30 seconds
@@ -25,9 +25,9 @@ export async function POST(req: Request) {
     }. Provide a ${difficulty}-level explanation of the concept. Include examples, analogies, and key points to remember. Structure your response with clear headings and bullet points where appropriate.`
 
     // Generate a streaming response using the AI SDK
-    const result = streamText({
+    const result = streamUI({
       model: openai("gpt-4o"),
-      prompt: prompt,
+      messages: [{ role: "user", content: prompt }],
       system: systemMessage,
     })
 

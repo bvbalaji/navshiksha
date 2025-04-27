@@ -52,6 +52,8 @@ export const authOptions = {
     error: "/login",
     signOut: "/",
   },
+  // Trust the host header for production environments
+  trustHost: true,
   debug: process.env.NODE_ENV === "development",
   secret: process.env.NEXTAUTH_SECRET,
   events: {

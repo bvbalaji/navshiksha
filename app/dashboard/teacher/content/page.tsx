@@ -26,7 +26,7 @@ import {
   FileIcon as FilePdf,
   Check,
 } from "lucide-react"
-import { generateText } from "ai"
+import { generateUI } from "ai"
 import { openai } from "@ai-sdk/openai"
 import { Progress } from "@/components/ui/progress"
 import {
@@ -121,9 +121,9 @@ export default function ContentCreatorPage() {
     setGeneratedContent("")
 
     try {
-      const { text } = await generateText({
+      const { text } = await generateUI({
         model: openai("gpt-4o"),
-        prompt: `Create educational content about ${topic}`,
+        messages: `Create educational content about ${topic}`,
         system: `You are an expert educational content creator for ${gradeLevel} students. 
         Create a ${contentType} about ${topic} for the subject ${subject}. 
         If it's a lesson, include an introduction, key concepts, examples, and a summary. 

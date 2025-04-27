@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Loader2, Send, Mic, MicOff } from "lucide-react"
-import { generateText } from "ai"
+import { generateUI } from "ai"
 import { openai } from "@ai-sdk/openai"
 
 interface Message {
@@ -48,9 +48,9 @@ export default function AITutor() {
 
     try {
       // Use AI SDK to generate response
-      const { text } = await generateText({
+      const { text } = await generateUI({
         model: openai("gpt-4o"),
-        prompt: `You are a helpful tutor specializing in ${subject}. 
+        messages: `You are a helpful tutor specializing in ${subject}. 
                 The student asks: ${userMessage}
                 Provide a clear, educational response that helps them understand the topic better.`,
         maxTokens: 500,

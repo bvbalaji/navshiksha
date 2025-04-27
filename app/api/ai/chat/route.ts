@@ -1,4 +1,4 @@
-import { streamText } from "ai"
+import { streamUI } from "ai"
 import { openai } from "@ai-sdk/openai"
 
 // Allow streaming responses up to 30 seconds
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       : "You are an AI tutor for Navshiksha, an educational platform. Help students learn effectively by providing clear explanations and examples."
 
     // Generate a streaming response using the AI SDK
-    const result = streamText({
+    const result = streamUI({
       model: openai("gpt-4o"),
       messages: messages.map((msg) => ({
         role: msg.role,

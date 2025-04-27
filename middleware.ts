@@ -8,7 +8,12 @@ export async function middleware(request: NextRequest) {
 
   try {
     // Get the token and check if the user is authenticated
-    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+      secureCookie: process.env.NODE_ENV === "production",
+    })
+
     const isAuthenticated = !!token
 
     // Define auth pages (login, register, etc.)

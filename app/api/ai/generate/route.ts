@@ -1,4 +1,4 @@
-import { generateText } from "ai"
+import { generateUI } from "ai"
 import { openai } from "@ai-sdk/openai"
 
 // Allow responses up to 30 seconds
@@ -15,9 +15,9 @@ export async function POST(req: Request) {
       : "You are an AI tutor for Navshiksha, an educational platform. Help students learn effectively by providing clear explanations and examples."
 
     // Generate a response using the AI SDK
-    const { text } = await generateText({
+    const { text } = await generateUI({
       model: openai("gpt-4o"),
-      prompt: prompt,
+      messages: [{ role: "user", content: prompt }],
       system: systemMessage,
       maxTokens: maxTokens,
     })

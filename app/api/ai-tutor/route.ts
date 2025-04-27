@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { generateText } from "ai"
+import { generateUI } from "ai"
 import { openai } from "@ai-sdk/openai"
 
 export async function POST(req: NextRequest) {
@@ -16,9 +16,9 @@ export async function POST(req: NextRequest) {
       : ""
 
     // Generate response using AI SDK
-    const { text } = await generateText({
+    const { text } = await generateUI({
       model: openai("gpt-4o"),
-      prompt: `You are an AI tutor specializing in ${subject || "general education"} 
+      messages: `You are an AI tutor specializing in ${subject || "general education"} 
               for ${level || "all"} level students.
               
               Previous conversation:
