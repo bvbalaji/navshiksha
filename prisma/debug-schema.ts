@@ -12,7 +12,7 @@ async function debugSchema() {
     // List all available models on the Prisma client
     console.log("Available models on Prisma client:")
     const clientKeys = Object.keys(prisma).filter(
-      (key) => !key.startsWith("_") && typeof prisma[key] === "object" && prisma[key] !== null,
+      (key:any) => !key.startsWith("_") && typeof prisma[key] === "object" && prisma[key] !== null,
     )
     console.log(clientKeys)
 

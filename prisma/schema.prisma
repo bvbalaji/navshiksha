@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch", "fullTextIndex"]
@@ -58,6 +61,14 @@ enum QuestionType {
   ESSAY
 }
 
+// New enum for feedback types
+enum FeedbackType {
+  POSITIVE
+  CONSTRUCTIVE
+  QUESTION
+  SUGGESTION
+}
+
 // ==================== USER MODELS ====================
 
 model User {
@@ -87,6 +98,15 @@ model User {
   
   // Assigned plans (as assigner)
   assigned_plans    PlanAssignment[] @relation("AssignedBy")
+  
+  // New relations for teacher dashboard
+  teacher_notes     TeacherNote[]
+  student_feedback  StudentFeedback[] @relation("FeedbackFrom")
+  teacher_feedback  StudentFeedback[] @relation("FeedbackTo")
+  teaching_classes  Class[]
+  announcements     Announcement[]
+  student_notes     TeacherNote[]     @relation("StudentNotes")
+  class_enrollments ClassStudent[]
 
   @@map("users")
   @@index([email])
@@ -163,6 +183,7 @@ model Subject {
   // Relations
   courses     Course[]
   learning_plans LearningPlan[]
+  classes     Class[]
 
   @@map("subjects")
   @@index([name])
@@ -186,6 +207,7 @@ model Course {
   creator           User       @relation(fields: [creator_id], references: [id])
   modules           Module[]
   enrollments       Enrollment[]
+  classes           ClassCourse[]
 
   @@map("courses")
   @@index([subject_id])
@@ -461,11 +483,27 @@ model LearningPlan {
   subject     Subject    @relation(fields: [subject_id], references: [id])
   creator     User       @relation(fields: [created_by], references: [id])
   assignments PlanAssignment[]
+  objectives  LearningObjective[]
 
   @@map("learning_plans")
   @@index([subject_id])
   @@index([created_by])
   @@index([is_template])
+}
+
+// New model for learning objectives
+model LearningObjective {
+  id              String    @id @default(uuid()) @db.Uuid
+  plan_id         String    @db.Uuid
+  description     String
+  success_criteria String?
+  sequence_order  Int
+  
+  // Relations
+  learning_plan   LearningPlan @relation(fields: [plan_id], references: [id], onDelete: Cascade)
+
+  @@map("learning_objectives")
+  @@index([plan_id])
 }
 
 model PlanAssignment {
@@ -477,6 +515,7 @@ model PlanAssignment {
   assigned_at DateTime   @default(now()) @db.Timestamptz()
   start_date  DateTime?  @db.Date
   end_date    DateTime?  @db.Date
+  notes       String?
   
   // Relations
   plan        LearningPlan @relation(fields: [plan_id], references: [id], onDelete: Cascade)
@@ -528,5 +567,153 @@ model AnalyticsEvent {
   @@map("analytics_events")
   @@index([user_id])
   @@index([event_type])
+  @@index([created_at])
+}
+
+// ==================== TEACHER DASHBOARD MODELS ====================
+
+// New model for teacher notes on students
+model TeacherNote {
+  id          String    @id @default(uuid()) @db.Uuid
+  teacher_id  String    @db.Uuid
+  student_id  String    @db.Uuid
+  content     String
+  created_at  DateTime  @default(now()) @db.Timestamptz()
+  updated_at  DateTime  @updatedAt @db.Timestamptz()
+  
+  // Relations
+  teacher     User      @relation(fields: [teacher_id], references: [id], onDelete: Cascade)
+  student     User      @relation("StudentNotes", fields: [student_id], references: [id], onDelete: Cascade)
+
+  @@map("teacher_notes")
+  @@index([teacher_id])
+  @@index([student_id])
+}
+
+// New model for student feedback
+model StudentFeedback {
+  id          String       @id @default(uuid()) @db.Uuid
+  student_id  String       @db.Uuid
+  teacher_id  String       @db.Uuid
+  content     String
+  feedback_type FeedbackType
+  created_at  DateTime     @default(now()) @db.Timestamptz()
+  
+  // Relations
+  student     User        @relation("FeedbackFrom", fields: [student_id], references: [id], onDelete: Cascade)
+  teacher     User        @relation("FeedbackTo", fields: [teacher_id], references: [id], onDelete: Cascade)
+
+  @@map("student_feedback")
+  @@index([student_id])
+  @@index([teacher_id])
+}
+
+// New model for class management
+model Class {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String
+  description String?
+  subject_id  String    @db.Uuid
+  teacher_id  String    @db.Uuid
+  start_date  DateTime  @db.Date
+  end_date    DateTime? @db.Date
+  created_at  DateTime  @default(now()) @db.Timestamptz()
+  updated_at  DateTime  @updatedAt @db.Timestamptz()
+  
+  // Relations
+  subject     Subject   @relation(fields: [subject_id], references: [id])
+  teacher     User      @relation(fields: [teacher_id], references: [id], onDelete: Cascade)
+  students    ClassStudent[]
+  courses     ClassCourse[]
+  announcements Announcement[]
+
+  @@map("classes")
+  @@index([teacher_id])
+  @@index([subject_id])
+}
+
+// New model for class-student relationship
+model ClassStudent {
+  class_id    String    @db.Uuid
+  student_id  String    @db.Uuid
+  joined_at   DateTime  @default(now()) @db.Timestamptz()
+  
+  // Relations
+  class       Class     @relation(fields: [class_id], references: [id], onDelete: Cascade)
+  student     User      @relation(fields: [student_id], references: [id], onDelete: Cascade)
+
+  @@id([class_id, student_id])
+  @@map("class_students")
+  @@index([class_id])
+  @@index([student_id])
+}
+
+// New model for class-course relationship
+model ClassCourse {
+  class_id    String    @db.Uuid
+  course_id   String    @db.Uuid
+  assigned_at DateTime  @default(now()) @db.Timestamptz()
+  
+  // Relations
+  class       Class     @relation(fields: [class_id], references: [id], onDelete: Cascade)
+  course      Course    @relation(fields: [course_id], references: [id], onDelete: Cascade)
+
+  @@id([class_id, course_id])
+  @@map("class_courses")
+  @@index([class_id])
+  @@index([course_id])
+}
+
+// New model for class announcements
+model Announcement {
+  id          String    @id @default(uuid()) @db.Uuid
+  class_id    String    @db.Uuid
+  teacher_id  String    @db.Uuid
+  title       String
+  content     String
+  created_at  DateTime  @default(now()) @db.Timestamptz()
+  updated_at  DateTime  @updatedAt @db.Timestamptz()
+  
+  // Relations
+  class       Class     @relation(fields: [class_id], references: [id], onDelete: Cascade)
+  teacher     User      @relation(fields: [teacher_id], references: [id], onDelete: Cascade)
+
+  @@map("announcements")
+  @@index([class_id])
+  @@index([teacher_id])
+}
+
+// New model for student performance analytics
+model StudentPerformance {
+  id              String    @id @default(uuid()) @db.Uuid
+  student_id      String    @db.Uuid
+  course_id       String?   @db.Uuid
+  class_id        String?   @db.Uuid
+  quiz_average    Float?
+  completion_rate Float?
+  engagement_score Float?
+  strengths       String[]
+  weaknesses      String[]
+  recorded_at     DateTime  @default(now()) @db.Timestamptz()
+
+  @@map("student_performance")
+  @@index([student_id])
+  @@index([course_id])
+  @@index([class_id])
+  @@index([recorded_at])
+}
+
+// New model for tracking teaching activities
+model TeachingActivity {
+  id          String    @id @default(uuid()) @db.Uuid
+  teacher_id  String    @db.Uuid
+  activity_type String
+  description String
+  metadata    Json?
+  created_at  DateTime  @default(now()) @db.Timestamptz()
+
+  @@map("teaching_activities")
+  @@index([teacher_id])
+  @@index([activity_type])
   @@index([created_at])
 }

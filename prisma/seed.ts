@@ -1,10 +1,14 @@
 import { PrismaClient } from "@prisma/client"
 import { randomUUID } from "crypto"
+import { exec } from "child_process"
+import { promisify } from "util"
 
 // Initialize Prisma Client with logging to help debug
 const prisma = new PrismaClient({
   log: ["query", "info", "warn", "error"],
 })
+
+const execPromise = promisify(exec)
 
 // Main seed function
 async function main() {
@@ -88,7 +92,17 @@ async function main() {
       }
     }
 
-    console.log("✅ Seeding completed successfully!")
+    console.log("✅ Base seeding completed successfully!")
+
+    // Run the teacher dashboard seeding
+    console.log("🌱 Running teacher dashboard seeding...")
+    try {
+      await execPromise('npx ts-node  prisma/seed-teacher-dashboard.ts')
+      console.log("✅ Teacher dashboard seeding completed successfully!")
+    } catch (error) {
+      console.error("❌ Teacher dashboard seeding failed:")
+      console.error(error)
+    }
   } catch (error) {
     console.error("❌ Seeding failed:")
     console.error(error)
@@ -151,7 +165,7 @@ async function seedSubjects() {
 }
 
 // Seed users
-async function seedUsers(userRoleValues) {
+async function seedUsers(userRoleValues: any) {
   // Add debug logging
   console.log("Starting seedUsers function...")
   console.log("User role values from DB:", JSON.stringify(userRoleValues, null, 2))
@@ -303,7 +317,7 @@ async function seedUsers(userRoleValues) {
 }
 
 // Seed courses
-async function seedCourses(subjectId, creatorId, courseLevelValues) {
+async function seedCourses(subjectId:any, creatorId:any, courseLevelValues:any) {
   // Extract the actual enum values from the database result
   const dbCourseLevels = Array.isArray(courseLevelValues) ? courseLevelValues.map((v) => v.enum_value) : []
 
@@ -431,7 +445,7 @@ async function seedCourses(subjectId, creatorId, courseLevelValues) {
 }
 
 // Seed modules
-async function seedModules(courseId) {
+async function seedModules(courseId:any) {
   const modules = [
     {
       id: randomUUID(),
@@ -494,7 +508,7 @@ async function seedModules(courseId) {
 }
 
 // Seed lessons
-async function seedLessons(moduleId, contentTypeValues) {
+async function seedLessons(moduleId:any, contentTypeValues:any) {
   // Extract the actual enum values from the database result
   const dbContentTypes = Array.isArray(contentTypeValues) ? contentTypeValues.map((v) => v.enum_value) : []
 
