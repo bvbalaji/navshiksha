@@ -1,9 +1,11 @@
 # Exit on error
 set -e
 
-echo "🔄 Running Prisma migrations..."
-npx prisma migrate dev --name teacher_dashboard
+# First, initialize the database
+echo "🔄 Initializing database..."
+./scripts/init-db.sh
 
+# Then seed the database
 echo "🌱 Seeding the database..."
 npx prisma db seed
 

@@ -19,14 +19,21 @@ export async function middleware(request: NextRequest) {
     // Define auth pages (login, register, etc.)
     const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/register")
 
-    // If on an auth page and already authenticated, redirect to dashboard
+    // If on an auth page and already authenticated, redirect based on role
     if (isAuthPage && isAuthenticated) {
+      // Check user role and redirect accordingly
+      if (token?.role === "TEACHER" || token?.role === "ADMIN") {
+        return NextResponse.redirect(new URL("/teacher", request.url))
+      }
       return NextResponse.redirect(new URL("/dashboard", request.url))
     }
 
     // If on a protected route and not authenticated, redirect to login
     const isProtectedRoute =
-      pathname.startsWith("/dashboard") || pathname.startsWith("/admin") || pathname.startsWith("/tutor")
+      pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/admin") ||
+      pathname.startsWith("/tutor") ||
+      pathname.startsWith("/teacher")
 
     if (isProtectedRoute && !isAuthenticated) {
       // Store the original URL to redirect back after login
@@ -49,7 +56,7 @@ export async function middleware(request: NextRequest) {
   }
 }
 
-// Specify which routes to apply the middleware to
+// Update the matcher configuration
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*", "/tutor/:path*", "/login", "/register"],
+  matcher: ["/dashboard/:path*", "/admin/:path*", "/tutor/:path*", "/teacher/:path*", "/login", "/register"],
 }

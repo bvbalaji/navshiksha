@@ -16,7 +16,7 @@ export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
-  const { status } = useSession()
+  const { status, data: session } = useSession()
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -27,9 +27,14 @@ export default function LoginPage() {
   // If already authenticated, redirect to dashboard
   useEffect(() => {
     if (status === "authenticated") {
-      router.push("/dashboard")
+      // Check user role and redirect accordingly
+      if (session?.user?.role === "TEACHER" || session?.user?.role === "ADMIN") {
+        router.push("/teacher")
+      } else {
+        router.push("/dashboard")
+      }
     }
-  }, [status, router])
+  }, [status, router, session])
 
   // Check for error or success messages from URL parameters
   useEffect(() => {
@@ -69,12 +74,16 @@ export default function LoginPage() {
       if (result?.error) {
         setError(result.error === "CredentialsSignin" ? "Invalid email or password" : result.error)
         setIsLoading(false)
-      } else if (result?.url) {
-        // Use router.push for client-side navigation
-        router.push(callbackUrl)
       } else {
-        // Fallback if no URL is returned
-        router.push("/dashboard")
+        // Get the user's role from the session
+        const session = await fetch("/api/auth/session").then((res) => res.json())
+
+        if (session?.user?.role === "TEACHER" || session?.user?.role === "ADMIN") {
+          router.push("/teacher")
+        } else {
+          // Use the callback URL or default to dashboard
+          router.push(callbackUrl !== "/dashboard" ? callbackUrl : "/dashboard")
+        }
       }
     } catch (error) {
       console.error("Login error:", error)
