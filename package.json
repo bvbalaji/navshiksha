@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
@@ -17,7 +17,6 @@
     "verify-icons": "ts-node  scripts/verify-icons.ts",
     "analyze-deps": "ts-node  scripts/analyze-dependencies.ts",
     "clean-deps": "ts-node  scripts/clean-dependencies.ts",
-    "fix-mapbox": "ts-node  scripts/fix-mapbox-issue.ts",
     "fix-prisma": "ts-node  scripts/fix-prisma-issues.ts",
     "regenerate-prisma": "ts-node  scripts/regenerate-prisma-client.ts",
     "fix-favicon": "bash scripts/fix-favicon.sh",
