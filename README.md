@@ -7,3 +7,5 @@ Admin personell can manage the overall functions in the application
 The application is built on Nextjs, Postgress, React and Vercel stack.
 
 The UI is SSR based.
+
+three persona are key in the app: admin, teacher and student.
