@@ -3,9 +3,6 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
-
-import { isProduction } from "@/lib/auth/auth-utils"
-
 interface LogoutButtonProps {
   callbackUrl?: string
   className?: string
@@ -37,12 +34,11 @@ export function LogoutButton({
         localStorage.removeItem("next-auth.callback-url")
         localStorage.removeItem("next-auth.csrf-token")
 
-        if(isProduction()){
-          // Clear client-side storage
-          localStorage.removeItem("__Secure-next-auth.session-token")
-          localStorage.removeItem("__Secure-next-auth.callback-url")
-          localStorage.removeItem("__Host-next-auth.csrf-token")
-        }
+        // Prod cookies
+        localStorage.removeItem("__Secure-next-auth.session-token")
+        localStorage.removeItem("__Secure-next-auth.callback-url")
+        localStorage.removeItem("__Host-next-auth.csrf-token")
+       
         sessionStorage.clear()
 
         // Force a hard navigation to the callback URL
