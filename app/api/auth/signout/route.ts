@@ -3,7 +3,7 @@ import { cookies } from "next/headers"
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
-  const callbackUrl = url.searchParams.get("callbackUrl") || "/"
+  const callbackUrl = await url.searchParams.get("callbackUrl") || "/"
 
   // Clear all auth-related cookies
   const cookieStore = await cookies()

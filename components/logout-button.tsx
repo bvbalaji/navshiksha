@@ -7,12 +7,13 @@ interface LogoutButtonProps {
   callbackUrl?: string
   className?: string
   children?: React.ReactNode
+  variant?: string
 }
 
 export function LogoutButton({
   callbackUrl = "/",
   className,
-  children = "Sign out",
+  children = "Log out",
 }: LogoutButtonProps) {
   const [isSigningOut, setIsSigningOut] = useState(false)
   const router = useRouter()
@@ -58,7 +59,7 @@ export function LogoutButton({
 
   return (
     <Button onClick={handleSignOut} disabled={isSigningOut} className={className} variant="outline">
-      {isSigningOut ? "Signing out..." : children}
+      {isSigningOut ? "Logging out..." : children}
     </Button>
   )
 }

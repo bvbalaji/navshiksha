@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { StudentMobileNav } from "./student-sidebar"
+import { LogoutButton } from "@/components/logout-button"
 
 export function StudentHeader() {
   const [notifications, setNotifications] = useState(3)
@@ -80,10 +81,7 @@ export function StudentHeader() {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href="/signout" className="cursor-pointer text-red-500 hover:text-red-500">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </Link>
+              <LogoutButton variant="ghost" className="w-full justify-start p-0 font-normal" />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

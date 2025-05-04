@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { useRouter } from "next/navigation"
+import { LogoutButton } from "@/components/logout-button"
 
 export function AdminHeader() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -176,8 +177,7 @@ export function AdminHeader() {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Log out</span>
+              <LogoutButton variant="ghost" className="w-full justify-start p-0 font-normal" />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
