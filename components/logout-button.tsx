@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
@@ -7,9 +9,14 @@ import { useRouter } from "next/navigation"
 interface LogoutButtonProps {
   callbackUrl?: string
   className?: string
+  children?: React.ReactNode
 }
 
-export function LogoutButton({ callbackUrl = "/", className }: LogoutButtonProps) {
+export function LogoutButton({
+  callbackUrl = "/",
+  className,
+  children = "Sign out",
+}: LogoutButtonProps) {
   const [isSigningOut, setIsSigningOut] = useState(false)
   const router = useRouter()
 
@@ -17,40 +24,38 @@ export function LogoutButton({ callbackUrl = "/", className }: LogoutButtonProps
     setIsSigningOut(true)
 
     try {
-      // First try the custom API approach
+      // First approach: Use /signout API endpoint
       const response = await fetch("/api/auth/signout", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ callbackUrl }),
       })
 
-      const data = await response.json()
+      if (response.ok) {
+        // Clear client-side storage
+        localStorage.removeItem("next-auth.session-token")
+        localStorage.removeItem("next-auth.callback-url")
+        localStorage.removeItem("next-auth.csrf-token")
+        sessionStorage.clear()
 
-      if (data.success) {
-        // Clear any client-side auth state
-        window.localStorage.removeItem("next-auth.session-token")
-        window.localStorage.removeItem("next-auth.callback-url")
-        window.localStorage.removeItem("next-auth.csrf-token")
-
-        // Navigate to the callback URL
-        router.push(data.url)
-        router.refresh()
-      } else {
-        // Fallback to direct navigation
+        // Force a hard navigation to the callback URL
         window.location.href = callbackUrl
+      } else {
+        // Fallback: Try direct navigation
+        window.location.href = `/api/auth/signout?callbackUrl=${encodeURIComponent(callbackUrl)}`
       }
     } catch (error) {
-      console.error("Log out error:", error)
-      // Fallback redirect
+      console.error("Sign out error:", error)
+      // Last resort fallback
       window.location.href = callbackUrl
+    } finally {
+      setIsSigningOut(false)
     }
   }
 
   return (
     <Button onClick={handleSignOut} disabled={isSigningOut} className={className} variant="outline">
-      {isSigningOut ? "Signing out..." : "Sign out"}
+      {isSigningOut ? "Signing out..." : children}
     </Button>
   )
 }

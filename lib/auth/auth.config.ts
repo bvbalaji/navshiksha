@@ -4,6 +4,8 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { verifyUserCredentials } from "@/lib/server/auth-utils"
 import { prisma } from "@/lib/prisma"
 
+import { isProduction } from "./auth-utils"
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -32,9 +34,49 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 60 * 60, // 1 hour
+  },
+  cookies: {
+    sessionToken: {
+      name: isProduction() ? `__Secure-next-auth.session-token` : `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: isProduction(),
+      },
+    },
+    callbackUrl: {
+      name: isProduction() ? `__Secure-next-auth.callback-url` : `next-auth.callback-url`,
+      options: {
+        sameSite: "lax",
+        path: "/",
+        secure: isProduction(),
+      },
+    },
+    csrfToken: {
+      name: isProduction() ? `__Host-next-auth.csrf-token` : `next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: isProduction(),
+      },
+    }
   },
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      // Handle relative URLs
+      if (url.startsWith("/")) {
+        return `${baseUrl}${url}`
+      }
+      // Allow redirects to the same site
+      else if (new URL(url).origin === baseUrl) {
+        return url
+      }
+      // Default to base URL for safety
+      return baseUrl
+    },
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role
@@ -53,7 +95,7 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/login",
     error: "/login",
-    signOut: "/",
+    signOut: "/api/auth/signout",
   },
   debug: process.env.NODE_ENV === "development",
 }
