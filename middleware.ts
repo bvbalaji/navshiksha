@@ -6,8 +6,13 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   try {
-    // Skip middleware for sign-out routes to prevent redirect loops
-    if (pathname.startsWith("/api/auth/signout") || pathname.startsWith("/api/auth/login")) {
+    // Skip middleware for ALL auth-related routes to prevent redirect loops
+    if (
+      pathname.startsWith("/api/auth") ||
+      pathname.startsWith("/api/logout") ||
+      pathname === "/login" ||
+      pathname === "/logout"
+    ) {
       return NextResponse.next()
     }
 

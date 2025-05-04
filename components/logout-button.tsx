@@ -1,65 +1,24 @@
+"use client"
+
 import type React from "react"
 
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
+
 interface LogoutButtonProps {
-  callbackUrl?: string
+  redirectTo?: string
   className?: string
   children?: React.ReactNode
-  variant?: string
 }
 
-export function LogoutButton({
-  callbackUrl = "/",
-  className,
-  children = "Log out",
-}: LogoutButtonProps) {
-  const [isSigningOut, setIsSigningOut] = useState(false)
-  const router = useRouter()
-
-  const handleSignOut = async () => {
-    setIsSigningOut(true)
-
-    try {
-      // First approach: Use /signout API endpoint
-      const response = await fetch("/api/auth/signout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ callbackUrl }),
-      })
-
-      if (response.ok) {
-        // Clear client-side storage
-        localStorage.removeItem("next-auth.session-token")
-        localStorage.removeItem("next-auth.callback-url")
-        localStorage.removeItem("next-auth.csrf-token")
-
-        // Prod cookies
-        localStorage.removeItem("__Secure-next-auth.session-token")
-        localStorage.removeItem("__Secure-next-auth.callback-url")
-        localStorage.removeItem("__Host-next-auth.csrf-token")
-       
-        sessionStorage.clear()
-
-        // Force a hard navigation to the callback URL
-        window.location.href = callbackUrl
-      } else {
-        // Fallback: Try direct navigation
-        window.location.href = `/api/auth/signout?callbackUrl=${encodeURIComponent(callbackUrl)}`
-      }
-    } catch (error) {
-      console.error("Sign out error:", error)
-      // Last resort fallback
-      window.location.href = callbackUrl
-    } finally {
-      setIsSigningOut(false)
-    }
+export function LogoutButton({ redirectTo = "/", className, children = "Log out" }: LogoutButtonProps) {
+  const handleLogout = () => {
+    // Use a direct navigation to our custom logout endpoint
+    window.location.href = `/api/logout?redirectTo=${encodeURIComponent(redirectTo)}`
   }
 
   return (
-    <Button onClick={handleSignOut} disabled={isSigningOut} className={className} variant="outline">
-      {isSigningOut ? "Logging out..." : children}
+    <Button onClick={handleLogout} className={className} variant="outline">
+      {children}
     </Button>
   )
 }
