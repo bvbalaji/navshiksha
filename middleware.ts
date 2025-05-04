@@ -2,19 +2,14 @@ import { NextResponse } from "next/server"
 import { getToken } from "next-auth/jwt"
 import type { NextRequest } from "next/server"
 
-// This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   try {
-    // Get the token and check if the user is authenticated
-    const token = await getToken({
-      req: request,
-      secret: process.env.NEXTAUTH_SECRET,
-      secureCookie: process.env.NODE_ENV === "production",
-    })
-
+    // Get the token using next-auth/jwt
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
     const isAuthenticated = !!token
+    const userRole = ((token?.role as string) || "").toUpperCase()
 
     // Define auth pages (login, register, etc.)
     const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/register")
@@ -22,18 +17,50 @@ export async function middleware(request: NextRequest) {
     // If on an auth page and already authenticated, redirect based on role
     if (isAuthPage && isAuthenticated) {
       // Check user role and redirect accordingly
-      if (token?.role === "TEACHER" || token?.role === "ADMIN") {
+      if (userRole === "ADMIN") {
+        return NextResponse.redirect(new URL("/admin", request.url))
+      } else if (userRole === "TEACHER") {
         return NextResponse.redirect(new URL("/teacher", request.url))
+      } else {
+        return NextResponse.redirect(new URL("/student", request.url))
       }
-      return NextResponse.redirect(new URL("/dashboard", request.url))
+    }
+
+    // Role-based access control
+    const isAdminRoute = pathname.startsWith("/admin")
+    const isTeacherRoute = pathname.startsWith("/teacher")
+    const isStudentRoute = pathname.startsWith("/student") || pathname.startsWith("/tutor")
+
+    // If authenticated but trying to access unauthorized routes
+    if (isAuthenticated) {
+      // Admin can access all routes
+      if (userRole === "ADMIN") {
+        // Allow access to all routes
+        return NextResponse.next()
+      }
+
+      // Teacher can access teacher routes but not admin routes
+      if (userRole === "TEACHER") {
+        if (isAdminRoute) {
+          return NextResponse.redirect(new URL("/teacher", request.url))
+        }
+
+        // Redirect teachers trying to access student routes to teacher dashboard
+        if (isStudentRoute) {
+          return NextResponse.redirect(new URL("/teacher", request.url))
+        }
+      }
+
+      // Student can only access student routes
+      if (userRole === "STUDENT" || userRole === "") {
+        if (isAdminRoute || isTeacherRoute) {
+          return NextResponse.redirect(new URL("/student", request.url))
+        }
+      }
     }
 
     // If on a protected route and not authenticated, redirect to login
-    const isProtectedRoute =
-      pathname.startsWith("/dashboard") ||
-      pathname.startsWith("/admin") ||
-      pathname.startsWith("/tutor") ||
-      pathname.startsWith("/teacher")
+    const isProtectedRoute = isStudentRoute || isTeacherRoute || isAdminRoute
 
     if (isProtectedRoute && !isAuthenticated) {
       // Store the original URL to redirect back after login
@@ -56,7 +83,18 @@ export async function middleware(request: NextRequest) {
   }
 }
 
-// Update the matcher configuration
+// Update the matcher configuration - removed /dashboard/:path*
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*", "/tutor/:path*", "/teacher/:path*", "/login", "/register"],
+  matcher: [
+    "/api/auth/:path*",
+    "/teacher/api/:path*",
+    "/student/api/:path*",
+    "/admin/api/:path*",
+    "/teacher/:path*",
+    "/student/:path*",
+    "/admin/:path*",
+    "/tutor/:path*",
+    "/login",
+    "/register",
+  ],
 }

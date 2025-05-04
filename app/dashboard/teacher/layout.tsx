@@ -1,7 +1,7 @@
 import type React from "react"
 import { redirect } from "next/navigation"
 import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/lib/auth-options"
+import { authOptions } from "@/lib/auth/auth.config"
 import TeacherSidebar from "@/components/teacher/teacher-sidebar"
 import DashboardHeader from "@/components/dashboard-header"
 

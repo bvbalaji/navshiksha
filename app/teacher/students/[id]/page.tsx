@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client"
 import { notFound } from "next/navigation"
-import { requireRole } from "@/lib/auth-utils"
+import { requireRole } from "@/lib/auth/auth"
 import { StudentProfile } from "@/components/teacher/student-profile"
 import { StudentPerformanceOverview } from "@/components/teacher/analytics/student-performance-overview"
 import { StudentFeedbackForm } from "@/components/teacher/student-feedback-form"

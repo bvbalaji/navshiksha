@@ -1,0 +1,114 @@
+{
+  "name": "Navshiksha Splash Screens",
+  "short_name": "Navshiksha",
+  "description": "Splash screen configuration for Navshiksha platform",
+  "background_color": "#ffffff",
+  "theme_color": "#4A6FFF",
+  "splash_screens": [
+    {
+      "name": "iPhone 5/SE",
+      "width": 320,
+      "height": 568,
+      "file": "splash/iphone5_splash.png",
+      "device": "iPhone 5, iPhone SE (1st generation)"
+    },
+    {
+      "name": "iPhone 6/7/8",
+      "width": 375,
+      "height": 667,
+      "file": "splash/iphone6_splash.png",
+      "device": "iPhone 6, iPhone 7, iPhone 8"
+    },
+    {
+      "name": "iPhone 6/7/8 Plus",
+      "width": 414,
+      "height": 736,
+      "file": "splash/iphoneplus_splash.png",
+      "device": "iPhone 6 Plus, iPhone 7 Plus, iPhone 8 Plus"
+    },
+    {
+      "name": "iPhone X/XS",
+      "width": 375,
+      "height": 812,
+      "file": "splash/iphonex_splash.png",
+      "device": "iPhone X, iPhone XS"
+    },
+    {
+      "name": "iPhone XR/XS Max",
+      "width": 414,
+      "height": 896,
+      "file": "splash/iphonexr_splash.png",
+      "device": "iPhone XR, iPhone XS Max"
+    },
+    {
+      "name": "iPhone 11 Pro/12/13",
+      "width": 390,
+      "height": 844,
+      "file": "splash/iphone12_splash.png",
+      "device": "iPhone 11 Pro, iPhone 12, iPhone 13"
+    },
+    {
+      "name": "iPhone 11/11 Pro Max/12 Pro Max/13 Pro Max",
+      "width": 428,
+      "height": 926,
+      "file": "splash/iphone12promax_splash.png",
+      "device": "iPhone 11, iPhone 11 Pro Max, iPhone 12 Pro Max, iPhone 13 Pro Max"
+    },
+    {
+      "name": "iPad Mini/Air",
+      "width": 768,
+      "height": 1024,
+      "file": "splash/ipad_splash.png",
+      "device": "iPad Mini, iPad Air"
+    },
+    {
+      "name": "iPad Pro 10.5\"",
+      "width": 834,
+      "height": 1112,
+      "file": "splash/ipadpro1_splash.png",
+      "device": "iPad Pro 10.5\""
+    },
+    {
+      "name": "iPad Pro 11\"",
+      "width": 834,
+      "height": 1194,
+      "file": "splash/ipadpro11_splash.png",
+      "device": "iPad Pro 11\""
+    },
+    {
+      "name": "iPad Pro 12.9\"",
+      "width": 1024,
+      "height": 1366,
+      "file": "splash/ipadpro2_splash.png",
+      "device": "iPad Pro 12.9\""
+    },
+    {
+      "name": "Android Small",
+      "width": 360,
+      "height": 640,
+      "file": "splash/android-small.png",
+      "device": "Small Android Devices"
+    },
+    {
+      "name": "Android Medium",
+      "width": 411,
+      "height": 731,
+      "file": "splash/android-medium.png",
+      "device": "Medium Android Devices"
+    },
+    {
+      "name": "Android Large",
+      "width": 480,
+      "height": 853,
+      "file": "splash/android-large.png",
+      "device": "Large Android Devices"
+    },
+    {
+      "name": "Android Tablet",
+      "width": 768,
+      "height": 1024,
+      "file": "splash/android-tablet.png",
+      "device": "Android Tablets"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { requireRole } from "@/lib/auth-utils"
+import { requireRole } from "@/lib/auth/auth"
 import { PrismaClient } from "@prisma/client"
 import { PieChart, Activity, BookOpen, CheckCircle, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"

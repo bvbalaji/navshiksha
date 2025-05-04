@@ -2,9 +2,9 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { signIn, useSession } from "next-auth/react"
+import { signIn } from "next-auth/react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,43 +16,12 @@ export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
-  const { status, data: session } = useSession()
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-
-  // If already authenticated, redirect to dashboard
-  useEffect(() => {
-    if (status === "authenticated") {
-      // Check user role and redirect accordingly
-      if (session?.user?.role === "TEACHER" || session?.user?.role === "ADMIN") {
-        router.push("/teacher")
-      } else {
-        router.push("/dashboard")
-      }
-    }
-  }, [status, router, session])
-
-  // Check for error or success messages from URL parameters
-  useEffect(() => {
-    const errorParam = searchParams.get("error")
-    if (errorParam) {
-      if (errorParam === "CredentialsSignin") {
-        setError("Invalid email or password")
-      } else {
-        setError(`An error occurred during sign in: ${errorParam}`)
-      }
-    }
-
-    // Check if user just registered
-    const registered = searchParams.get("registered")
-    if (registered === "true") {
-      setSuccess("Account created successfully! You can now log in.")
-    }
-  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -77,12 +46,16 @@ export default function LoginPage() {
       } else {
         // Get the user's role from the session
         const session = await fetch("/api/auth/session").then((res) => res.json())
+        const userRole = session?.user?.role || "STUDENT"
 
-        if (session?.user?.role === "TEACHER" || session?.user?.role === "ADMIN") {
+        if (userRole === "TEACHER") {
           router.push("/teacher")
+        } else if (userRole === "ADMIN") {
+          router.push("/admin")
         } else {
           // Use the callback URL or default to dashboard
-          router.push(callbackUrl !== "/dashboard" ? callbackUrl : "/dashboard")
+          // student
+          router.push("/student")
         }
       }
     } catch (error) {
@@ -90,15 +63,6 @@ export default function LoginPage() {
       setError("An unexpected error occurred. Please try again.")
       setIsLoading(false)
     }
-  }
-
-  // If checking authentication status, show loading
-  if (status === "loading") {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Loading...</p>
-      </div>
-    )
   }
 
   return (

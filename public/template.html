@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Essential Meta Tags -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  <!-- Primary Meta Tags -->
+  <title>Navshiksha - Personalized Learning Platform</title>
+  <meta name="title" content="Navshiksha - Personalized Learning Platform">
+  <meta name="description" content="Navshiksha provides personalized learning experiences with AI-powered tutoring, comprehensive analytics, and interactive content for students and teachers.">
+  <meta name="keywords" content="education, e-learning, online learning, AI tutoring, personalized learning, teacher dashboard, student analytics">
+  <meta name="author" content="Navshiksha">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Favicon and App Icons -->
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#4f46e5">
+  <meta name="msapplication-TileColor" content="#4f46e5">
+  <meta name="msapplication-navbutton-color" content="#4f46e5">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#4f46e5">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://navshiksha.edu/">
+  <meta property="og:title" content="Navshiksha - Personalized Learning Platform">
+  <meta property="og:description" content="Navshiksha provides personalized learning experiences with AI-powered tutoring, comprehensive analytics, and interactive content for students and teachers.">
+  <meta property="og:image" content="https://navshiksha.edu/images/og-image.jpg">
+  <meta property="og:image:alt" content="Navshiksha Platform Screenshot">
+  <meta property="og:site_name" content="Navshiksha">
+  <meta property="og:locale" content="en_US">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://navshiksha.edu/">
+  <meta property="twitter:title" content="Navshiksha - Personalized Learning Platform">
+  <meta property="twitter:description" content="Navshiksha provides personalized learning experiences with AI-powered tutoring, comprehensive analytics, and interactive content for students and teachers.">
+  <meta property="twitter:image" content="https://navshiksha.edu/images/twitter-image.jpg">
+  <meta property="twitter:creator" content="@navshiksha">
+  
+  <!-- Preconnect to External Resources -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Font Preloading -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  
+  <!-- Preload Critical Assets -->
+  <link rel="preload" href="/styles/critical.css" as="style">
+  <link rel="preload" href="/images/hero-image.webp" as="image" type="image/webp">
+  
+  <!-- Critical CSS -->
+  <style>
+    /* Insert critical CSS here */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      background-color: #f9fafb;
+    }
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(79, 70, 229, 0.2);
+      border-radius: 50%;
+      border-top-color: #4f46e5;
+      animation: spin 1s ease-in-out infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+  
+  <!-- Structured Data / JSON-LD -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "Navshiksha",
+      "url": "https://navshiksha.edu",
+      "logo": "https://navshiksha.edu/images/logo.png",
+      "description": "Navshiksha provides personalized learning experiences with AI-powered tutoring, comprehensive analytics, and interactive content for students and teachers.",
+      "sameAs": [
+        "https://facebook.com/navshiksha",
+        "https://twitter.com/navshiksha",
+        "https://linkedin.com/company/navshiksha",
+        "https://instagram.com/navshiksha"
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "India"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+91-123-456-7890",
+        "contactType": "customer service",
+        "email": "contact@navshiksha.edu"
+      }
+    }
+  </script>
+  
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+  <!-- End Google Tag Manager -->
+  
+  <!-- Custom JavaScript -->
+  <script>
+    // Performance measurement
+    window.performance && window.performance.mark && window.performance.mark('navshiksha_start');
+    
+    // Browser feature detection
+    const supportsWebP = (function() {
+      const elem = document.createElement('canvas');
+      if (elem.getContext && elem.getContext('2d')) {
+        return elem.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+      }
+      return false;
+    })();
+    
+    if (!supportsWebP) {
+      document.documentElement.classList.add('no-webp');
+    }
+  </script>
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+  <!-- Initial Loading State -->
+  <div id="loading" class="loading">
+    <div class="loading-spinner"></div>
+  </div>
+  
+  <!-- Next.js App Mount Point -->
+  <div id="__next"></div>
+  
+  <!-- Deferred Scripts -->
+  <script defer src="/scripts/analytics.js"></script>
+  
+  <!-- Custom Script for App Initialization -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Hide loading indicator when app is ready
+      window.addEventListener('load', function() {
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) {
+          loadingElement.style.display = 'none';
+        }
+        
+        // Mark performance end
+        if (window.performance && window.performance.mark) {
+          window.performance.mark('navshiksha_loaded');
+          window.performance.measure('navshiksha_load_time', 'navshiksha_start', 'navshiksha_loaded');
+        }
+      });
+    });
+  </script>
+  
+  <!-- Accessibility Helper -->
+  <script>
+    // Skip to content functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const skipLink = document.createElement('a');
+      skipLink.href = '#main-content';
+      skipLink.className = 'skip-link';
+      skipLink.textContent = 'Skip to main content';
+      skipLink.style.cssText = 'position: absolute; top: -40px; left: 0; background: #4f46e5; color: white; padding: 8px; z-index: 100; transition: top 0.2s;';
+      skipLink.addEventListener('focus', function() {
+        this.style.top = '0';
+      });
+      skipLink.addEventListener('blur', function() {
+        this.style.top = '-40px';
+      });
+      document.body.insertBefore(skipLink, document.body.firstChild);
+    });
+  </script>
+</body>
+</html>

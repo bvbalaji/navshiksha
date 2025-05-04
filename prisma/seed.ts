@@ -97,7 +97,7 @@ async function main() {
     // Run the teacher dashboard seeding
     console.log("🌱 Running teacher dashboard seeding...")
     try {
-      await execPromise('npx ts-node  prisma/seed-teacher-dashboard.ts')
+      await execPromise('npx ts-node --compiler-options \'{"module":"CommonJS"}\' prisma/seed-teacher-dashboard.ts')
       console.log("✅ Teacher dashboard seeding completed successfully!")
     } catch (error) {
       console.error("❌ Teacher dashboard seeding failed:")
@@ -165,7 +165,7 @@ async function seedSubjects() {
 }
 
 // Seed users
-async function seedUsers(userRoleValues: any) {
+async function seedUsers(userRoleValues) {
   // Add debug logging
   console.log("Starting seedUsers function...")
   console.log("User role values from DB:", JSON.stringify(userRoleValues, null, 2))
@@ -317,7 +317,7 @@ async function seedUsers(userRoleValues: any) {
 }
 
 // Seed courses
-async function seedCourses(subjectId:any, creatorId:any, courseLevelValues:any) {
+async function seedCourses(subjectId, creatorId, courseLevelValues) {
   // Extract the actual enum values from the database result
   const dbCourseLevels = Array.isArray(courseLevelValues) ? courseLevelValues.map((v) => v.enum_value) : []
 
@@ -445,7 +445,7 @@ async function seedCourses(subjectId:any, creatorId:any, courseLevelValues:any) 
 }
 
 // Seed modules
-async function seedModules(courseId:any) {
+async function seedModules(courseId) {
   const modules = [
     {
       id: randomUUID(),
@@ -508,7 +508,7 @@ async function seedModules(courseId:any) {
 }
 
 // Seed lessons
-async function seedLessons(moduleId:any, contentTypeValues:any) {
+async function seedLessons(moduleId, contentTypeValues) {
   // Extract the actual enum values from the database result
   const dbContentTypes = Array.isArray(contentTypeValues) ? contentTypeValues.map((v) => v.enum_value) : []
 

@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button"
 import { BookOpen, Users, FileText, TrendingUp, AlertCircle, Plus } from "lucide-react"
 import Link from "next/link"
 import TeacherUpcomingClasses from "@/components/teacher/teacher-upcoming-classes"
-import TeacherRecentActivity from "@/components/teacher/teacher-recent-activity"
+import { RecentActivities } from "@/components/teacher/dashboard/recent-activities"
 import { redirect } from "next/navigation"
 import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/lib/auth-options"
+import { authOptions } from "@/lib/auth/auth.config" 
 
 export default async function TeacherDashboardPage() {
   const session = await getServerSession(authOptions)
@@ -104,7 +104,7 @@ export default async function TeacherDashboardPage() {
             <TeacherUpcomingClasses />
           </TabsContent>
           <TabsContent value="activity" className="mt-4">
-            <TeacherRecentActivity />
+            <RecentActivities />
           </TabsContent>
         </Tabs>
       </div>

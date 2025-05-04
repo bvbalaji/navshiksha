@@ -24,11 +24,14 @@ export function NavButtons({ className }: NavButtonsProps) {
     )
   }
 
-  // If authenticated, show logout button and dashboard link
+  // If authenticated, show logout button and dashboard link based on user role
   if (status === "authenticated") {
+    // Determine dashboard route based on user role
+    const dashboardRoute = getDashboardRouteByRole(session?.user?.role as string)
+
     return (
       <div className={className}>
-        <Button variant="outline" size="sm" className="mr-2" onClick={() => router.push("/dashboard")}>
+        <Button variant="outline" size="sm" className="mr-2" onClick={() => router.push(dashboardRoute)}>
           Dashboard
         </Button>
         <LogoutButton />
@@ -47,4 +50,17 @@ export function NavButtons({ className }: NavButtonsProps) {
       </Button>
     </div>
   )
+}
+
+// Helper function to determine dashboard route based on user role
+function getDashboardRouteByRole(role?: string): string {
+  if (!role) return "/student"
+
+  const normalizedRole = role.toUpperCase()
+
+  if (normalizedRole === "ADMIN") return "/admin"
+  if (normalizedRole === "TEACHER") return "/teacher"
+
+  // Default to student dashboard
+  return "/student"
 }

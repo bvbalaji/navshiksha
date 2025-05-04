@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { PrismaClient } from "@prisma/client"
-import { requireRole } from "@/lib/auth-utils"
+import { requireRole } from "@/lib/auth/auth"
 import Link from "next/link"
 import { FileText, Plus, Users, Edit } from "lucide-react"
 

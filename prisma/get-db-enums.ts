@@ -28,7 +28,7 @@ async function getDbEnums() {
     console.log(JSON.stringify(enumTypes, null, 2))
 
     // Group enum values by enum name for easier reading
-    const groupedEnums: any = {}
+    const groupedEnums = {}
     for (const item of enumTypes as any[]) {
       if (!groupedEnums[item.enum_name]) {
         groupedEnums[item.enum_name] = []
@@ -38,7 +38,7 @@ async function getDbEnums() {
 
     console.log("\nGrouped enum values:")
     for (const [enumName, values] of Object.entries(groupedEnums)) {
-      console.log(`${enumName}: ${values}`)
+      console.log(`${enumName}: ${values.join(", ")}`)
     }
 
     return enumTypes

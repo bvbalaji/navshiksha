@@ -26,7 +26,13 @@ import {
   FileIcon as FilePdf,
   Check,
 } from "lucide-react"
-import { generateUI } from "ai"
+import { OpenAI } from "openai"
+
+// Initialize the OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
+
 import { openai } from "@ai-sdk/openai"
 import { Progress } from "@/components/ui/progress"
 import {

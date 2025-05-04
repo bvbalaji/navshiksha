@@ -1,6 +1,6 @@
 "use server"
 import { redirect } from "next/navigation"
-import { LoginSchema, verifyCredentials, createSessionToken, setSessionCookie, logout as logoutUser } from "@/lib/auth"
+import { LoginSchema, verifyCredentials, createSessionToken, setSessionCookie, logout as logoutUser } from "@/lib/server/auth-utils"
 
 export async function login(prevState: any, formData: FormData) {
   // Validate form data

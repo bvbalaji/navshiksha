@@ -9,7 +9,13 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Loader2, Send, Mic, MicOff } from "lucide-react"
-import { generateUI } from "ai"
+import { OpenAI } from "openai"
+
+// Initialize the OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
+
 import { openai } from "@ai-sdk/openai"
 
 interface Message {

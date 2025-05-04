@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { PrismaClient } from "@prisma/client"
-import bcrypt from "bcrypt"
+import { verifyPassword } from "@/lib/crypto/simple-crypto"
 
 const prisma = new PrismaClient()
 
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
 
     // Test password comparison
     try {
-      const passwordMatch = await bcrypt.compare(password, user.hashed_password)
+      const passwordMatch = verifyPassword(password, user.hashed_password)
       console.log("Password match:", passwordMatch)
 
       return NextResponse.json({

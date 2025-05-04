@@ -1,16 +1,9 @@
 "use client"
 
+import type React from "react"
+
 import { SessionProvider } from "next-auth/react"
-import type { ReactNode } from "react"
 
-interface AuthProviderProps {
-  children: ReactNode
-}
-
-export function AuthProvider({ children }: AuthProviderProps) {
-  return (
-    <SessionProvider refetchInterval={0} refetchOnWindowFocus={false}>
-      {children}
-    </SessionProvider>
-  )
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  return <SessionProvider>{children}</SessionProvider>
 }

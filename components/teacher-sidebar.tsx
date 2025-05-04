@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { BookOpen, Users, BarChart, FileText, Settings, Menu, X, Home } from "lucide-react"
+import { BookOpen, Users, BarChart, FileText, Settings, Menu, X, Home, BookOpenCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { LogoutButton } from "@/components/logout-button"
@@ -21,6 +21,12 @@ export function TeacherSidebar() {
       icon: Home,
       href: "/teacher",
       active: pathname === "/teacher",
+    },
+    {
+      label: "Courses",
+      icon: BookOpenCheck,
+      href: "/teacher/courses",
+      active: pathname === "/teacher/courses" || pathname.startsWith("/teacher/courses/"),
     },
     {
       label: "Content Creation",

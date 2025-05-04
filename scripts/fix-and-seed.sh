@@ -4,7 +4,7 @@ set -e
 echo "🔍 Checking database state..."
 
 # Check if users table exists
-USER_TABLE_EXISTS=$(npx ts-node -e "
+USER_TABLE_EXISTS=$(npx ts-node --compiler-options '{"module":"CommonJS"}' -e "
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 async function check() {

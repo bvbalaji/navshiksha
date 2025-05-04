@@ -1,74 +1,12 @@
+import { BookOpen, Users, BarChart, FileText } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BookOpen, Users, FileText } from "lucide-react"
-import { requireRole } from "@/lib/auth-utils"
-import { PrismaClient } from "@prisma/client"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { StatsCard } from "@/components/teacher/dashboard/stats-card"
+import { RecentActivities } from "@/components/teacher/dashboard/recent-activities"
 
-const prisma = new PrismaClient()
-
-async function getTeacherStats(teacherId: string) {
-  const coursesCount = await prisma.course.count({
-    where: { creator_id: teacherId },
-  })
-
-  const classesCount = await prisma.class.count({
-    where: { teacher_id: teacherId },
-  })
-
-  const studentsCount = await prisma.$queryRaw`
-    SELECT COUNT(DISTINCT cs.student_id) 
-    FROM "class_students" cs
-    JOIN "classes" c ON cs.class_id = c.id
-    WHERE c.teacher_id = ${teacherId}::uuid
-  `
-
-  const plansCount = await prisma.learningPlan.count({
-    where: { created_by: teacherId },
-  })
-
-  return {
-    coursesCount,
-    classesCount,
-    studentsCount: Number(studentsCount[0]?.count || 0),
-    plansCount,
-  }
-}
-
-async function getRecentClasses(teacherId: string) {
-  return prisma.class.findMany({
-    where: { teacher_id: teacherId },
-    orderBy: { created_at: "desc" },
-    take: 5,
-    include: {
-      subject: true,
-      _count: {
-        select: { students: true },
-      },
-    },
-  })
-}
-
-async function getRecentAnnouncements(teacherId: string) {
-  return prisma.announcement.findMany({
-    where: { teacher_id: teacherId },
-    orderBy: { created_at: "desc" },
-    take: 5,
-    include: {
-      class: true,
-    },
-  })
-}
-
-export default async function TeacherDashboard() {
-  const session = await requireRole(["TEACHER", "ADMIN"])
-  const teacherId = session.user.id
-
-  const stats = await getTeacherStats(teacherId)
-  const recentClasses = await getRecentClasses(teacherId)
-  const recentAnnouncements = await getRecentAnnouncements(teacherId)
-
+export default async function TeacherDashboardPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -80,128 +18,83 @@ export default async function TeacherDashboard() {
 
       {/* Stats Overview */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardContent className="flex flex-row items-center justify-between p-6">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Total Courses</p>
-              <p className="text-3xl font-bold">{stats.coursesCount}</p>
-            </div>
-            <BookOpen className="h-8 w-8 text-primary/60" />
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Total Students"
+          value="256"
+          description="12% increase from last month"
+          trend="up"
+          trendValue="12%"
+          icon={<Users className="h-4 w-4" />}
+        />
 
-        <Card>
-          <CardContent className="flex flex-row items-center justify-between p-6">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Active Classes</p>
-              <p className="text-3xl font-bold">{stats.classesCount}</p>
-            </div>
-            <Users className="h-8 w-8 text-primary/60" />
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Active Courses"
+          value="8"
+          description="2 new courses this month"
+          trend="up"
+          trendValue="25%"
+          icon={<BookOpen className="h-4 w-4" />}
+        />
 
-        <Card>
-          <CardContent className="flex flex-row items-center justify-between p-6">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Total Students</p>
-              <p className="text-3xl font-bold">{stats.studentsCount}</p>
-            </div>
-            <Users className="h-8 w-8 text-primary/60" />
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Completion Rate"
+          value="68%"
+          description="3% decrease from last month"
+          trend="down"
+          trendValue="3%"
+          icon={<BarChart className="h-4 w-4" />}
+        />
 
-        <Card>
-          <CardContent className="flex flex-row items-center justify-between p-6">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Learning Plans</p>
-              <p className="text-3xl font-bold">{stats.plansCount}</p>
-            </div>
-            <FileText className="h-8 w-8 text-primary/60" />
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Learning Plans"
+          value="12"
+          description="Same as last month"
+          trend="neutral"
+          trendValue="0%"
+          icon={<FileText className="h-4 w-4" />}
+        />
       </div>
 
       {/* Tabs for different sections */}
-      <Tabs defaultValue="classes">
+      <Tabs defaultValue="activities">
         <TabsList>
+          <TabsTrigger value="activities">Recent Activities</TabsTrigger>
           <TabsTrigger value="classes">Recent Classes</TabsTrigger>
-          <TabsTrigger value="announcements">Recent Announcements</TabsTrigger>
-          <TabsTrigger value="activity">Student Activity</TabsTrigger>
+          <TabsTrigger value="announcements">Announcements</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="classes" className="space-y-4 pt-4">
-          {recentClasses.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {recentClasses.map((cls) => (
-                <Card key={cls.id}>
-                  <CardHeader className="pb-2">
-                    <CardTitle>{cls.name}</CardTitle>
-                    <CardDescription>{cls.subject.name}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">{cls._count.students} students</span>
-                      </div>
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`/teacher/students/class/${cls.id}`}>View Class</Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <p className="text-center text-muted-foreground">No classes found. Create your first class!</p>
-          )}
-          <div className="flex justify-center">
-            <Button variant="outline" asChild>
-              <Link href="/teacher/students/classes">View All Classes</Link>
-            </Button>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="announcements" className="space-y-4 pt-4">
-          {recentAnnouncements.length > 0 ? (
-            <div className="space-y-4">
-              {recentAnnouncements.map((announcement) => (
-                <Card key={announcement.id}>
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle>{announcement.title}</CardTitle>
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(announcement.created_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <CardDescription>Class: {announcement.class.name}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="line-clamp-2">{announcement.content}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <p className="text-center text-muted-foreground">No announcements found.</p>
-          )}
-          <div className="flex justify-center">
-            <Button variant="outline" asChild>
-              <Link href="/teacher/students/announcements">Manage Announcements</Link>
-            </Button>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="activity" className="pt-4">
+        <TabsContent value="activities" className="space-y-4 pt-4">
           <Card>
             <CardHeader>
-              <CardTitle>Recent Student Activity</CardTitle>
-              <CardDescription>Overview of student engagement in the past 7 days</CardDescription>
+              <CardTitle>Student Activities</CardTitle>
+              <CardDescription>Recent activities from your students</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px] flex items-center justify-center">
-                <p className="text-muted-foreground">Student activity chart will be displayed here</p>
-              </div>
+              <RecentActivities />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="classes" className="space-y-4 pt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Classes</CardTitle>
+              <CardDescription>Your most recent classes</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-center text-muted-foreground">Class information will be displayed here</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="announcements" className="pt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Announcements</CardTitle>
+              <CardDescription>Your most recent announcements</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-center text-muted-foreground">Announcement information will be displayed here</p>
             </CardContent>
           </Card>
         </TabsContent>

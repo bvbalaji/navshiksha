@@ -1,8 +1,13 @@
-import { streamUI } from "ai"
-import { openai } from "@ai-sdk/openai"
+import { OpenAI } from "openai"
+import { StreamingTextResponse } from "ai"
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30
+
+// Initialize the OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
 
 export async function POST(req: Request) {
   try {
@@ -24,15 +29,18 @@ export async function POST(req: Request) {
       subject || "various subjects"
     }. Provide a ${difficulty}-level explanation of the concept. Include examples, analogies, and key points to remember. Structure your response with clear headings and bullet points where appropriate.`
 
-    // Generate a streaming response using the AI SDK
-    const result = streamUI({
-      model: openai("gpt-4o"),
-      messages: [{ role: "user", content: prompt }],
-      system: systemMessage,
+    // Generate a streaming response using the OpenAI API
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: systemMessage },
+        { role: "user", content: prompt },
+      ],
+      stream: true,
     })
 
-    // Return the response as a streaming text response
-    return result.toDataStreamResponse()
+    // Convert the response to a readable stream and return it
+    return new StreamingTextResponse(response)
   } catch (error) {
     console.error("AI explanation error:", error)
     return new Response(JSON.stringify({ error: "Failed to generate explanation" }), {

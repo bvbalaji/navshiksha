@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client"
 import { notFound } from "next/navigation"
-import { requireRole } from "@/lib/auth-utils"
+import { requireRole } from "@/lib/auth/auth" 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"

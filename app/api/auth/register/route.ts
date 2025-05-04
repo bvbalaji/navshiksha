@@ -1,34 +1,33 @@
 import { NextResponse } from "next/server"
-import { createUser } from "@/lib/auth-service"
+import { createUser, getUserByEmail } from "@/lib/server/auth-utils"
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const { name, email, password, role } = await req.json()
+    const { name, email, password } = await request.json()
 
-    if (!email || !password) {
-      return NextResponse.json({ error: "Email and password are required" }, { status: 400 })
+    if (!name || !email || !password) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    try {
-      const user = await createUser({
-        name,
-        email,
-        password,
-        role,
-      })
-
-      return NextResponse.json({
-        success: true,
-        user,
-      })
-    } catch (error) {
-      if ((error as Error).message === "User already exists") {
-        return NextResponse.json({ error: "User already exists" }, { status: 409 })
-      }
-      throw error
+    // Check if user already exists
+    const existingUser = await getUserByEmail(email)
+    if (existingUser) {
+      return NextResponse.json({ error: "User with this email already exists" }, { status: 409 })
     }
+
+    // Create the user
+    const user = await createUser(name, email, password)
+
+    return NextResponse.json(
+      {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+      { status: 201 },
+    )
   } catch (error) {
     console.error("Registration error:", error)
-    return NextResponse.json({ error: "Failed to register user" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to create user" }, { status: 500 })
   }
 }

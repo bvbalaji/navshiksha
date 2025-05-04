@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client"
 import { CourseForm } from "@/components/teacher/content/course-form"
-import { requireRole } from "@/lib/auth-utils"
+import { requireRole } from "@/lib/auth/auth"
 
 const prisma = new PrismaClient()
 

@@ -1,55 +1,41 @@
 import { NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
-import bcrypt from "bcrypt"
-import { randomUUID } from "crypto"
+import { createUser, getUserByEmail } from "@/lib/server/auth-utils"
+import { UserRole } from "@prisma/client"
 
-const prisma = new PrismaClient()
-
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const { email, password, name, role } = await req.json()
+    // Only allow in development
+    if (process.env.NODE_ENV !== "development") {
+      return NextResponse.json({ error: "This endpoint is only available in development" }, { status: 403 })
+    }
 
-    if (!email || !password) {
-      return NextResponse.json({ error: "Email and password are required" }, { status: 400 })
+    const { name, email, password, role } = await request.json()
+
+    if (!name || !email || !password) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    })
-
+    const existingUser = await getUserByEmail(email)
     if (existingUser) {
-      return NextResponse.json({ error: "User already exists", userId: existingUser.id }, { status: 409 })
+      return NextResponse.json({ error: "User with this email already exists" }, { status: 409 })
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10)
+    // Create the user with the specified role or default to STUDENT
+    const userRole = (role as UserRole) || UserRole.STUDENT
+    const user = await createUser(name, email, password, userRole)
 
-    // Create the user
-    const user = await prisma.user.create({
-      data: {
-        id: randomUUID(),
-        email,
-        name: name || "Test User",
-        hashed_password: hashedPassword,
-        role: role || "STUDENT",
-        created_at: new Date(),
-        updated_at: new Date(),
+    return NextResponse.json(
+      {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
       },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-      },
-    })
-
-    return NextResponse.json({
-      message: "Test user created successfully",
-      user,
-    })
+      { status: 201 },
+    )
   } catch (error) {
-    console.error("Error creating test user:", error)
+    console.error("Test user creation error:", error)
     return NextResponse.json({ error: "Failed to create test user" }, { status: 500 })
   }
 }

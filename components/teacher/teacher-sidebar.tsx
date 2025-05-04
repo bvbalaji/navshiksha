@@ -1,128 +1,104 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { BookOpen, LayoutDashboard, Users, FileText, BarChart, Settings, Brain, PenTool } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { BookOpen, Users, BarChart, FileText, Settings, Home, BookOpenCheck } from "lucide-react"
+import { useState } from "react"
+import { LogoutButton } from "@/components/logout-button"
 
-export default function TeacherSidebar() {
+export function TeacherSidebar() {
   const pathname = usePathname()
-  const [mounted, setMounted] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
-  // Prevent hydration errors by only rendering after mount
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const isActive = (path: string) => {
-    if (!mounted) return false
-    return pathname === path || pathname.startsWith(`${path}/`)
-  }
-
-  const navItems = [
+  const routes = [
     {
-      title: "Dashboard",
-      href: "/dashboard/teacher",
-      icon: LayoutDashboard,
-      exact: true,
+      label: "Dashboard",
+      icon: Home,
+      href: "/teacher",
+      active: pathname === "/teacher",
     },
     {
-      title: "Students",
-      href: "/dashboard/teacher/students",
-      icon: Users,
+      label: "Courses",
+      icon: BookOpenCheck,
+      href: "/teacher/courses",
+      active: pathname === "/teacher/courses" || pathname.startsWith("/teacher/courses/"),
     },
     {
-      title: "Courses",
-      href: "/dashboard/teacher/courses",
+      label: "Content Creation",
       icon: BookOpen,
+      href: "/teacher/content",
+      active: pathname === "/teacher/content" || pathname.startsWith("/teacher/content/"),
     },
     {
-      title: "Content Creator",
-      href: "/dashboard/teacher/content",
-      icon: PenTool,
+      label: "Students",
+      icon: Users,
+      href: "/teacher/students",
+      active: pathname === "/teacher/students" || pathname.startsWith("/teacher/students/"),
     },
     {
-      title: "Assignments",
-      href: "/dashboard/teacher/assignments",
-      icon: FileText,
-    },
-    {
-      title: "Analytics",
-      href: "/dashboard/teacher/analytics",
+      label: "Analytics",
       icon: BarChart,
+      href: "/teacher/analytics",
+      active: pathname === "/teacher/analytics",
     },
-  ]
-
-  const accountItems = [
     {
-      title: "Settings",
-      href: "/dashboard/teacher/settings",
+      label: "Learning Plans",
+      icon: FileText,
+      href: "/teacher/plans",
+      active: pathname === "/teacher/plans" || pathname.startsWith("/teacher/plans/"),
+    },
+    {
+      label: "Settings",
       icon: Settings,
+      href: "/teacher/settings",
+      active: pathname === "/teacher/settings",
     },
   ]
-
-  // Return a simplified version during SSR to prevent hydration mismatch
-  if (!mounted) {
-    return (
-      <aside className="hidden w-64 flex-col border-r bg-muted/40 lg:flex">
-        <div className="flex h-14 items-center border-b px-4">
-          <div className="flex items-center gap-2 font-semibold">
-            <Brain className="h-5 w-5 text-primary" />
-            <span>Naviksha Teacher</span>
-          </div>
-        </div>
-        <nav className="flex-1 overflow-auto py-4">{/* Simplified content for SSR */}</nav>
-      </aside>
-    )
-  }
 
   return (
-    <aside className="hidden w-64 flex-col border-r bg-muted/40 lg:flex">
-      <div className="flex h-14 items-center border-b px-4">
-        <Link href="/dashboard/teacher" className="flex items-center gap-2 font-semibold">
-          <Brain className="h-5 w-5 text-primary" />
-          <span>Naviksha Teacher</span>
-        </Link>
+    <>
+      {/* Mobile menu button is now in the header */}
+
+      {/* Sidebar */}
+      <div
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 w-64 transform bg-white shadow-lg transition-transform duration-200 ease-in-out md:relative md:translate-x-0",
+          isOpen ? "translate-x-0" : "-translate-x-full",
+        )}
+      >
+        <div className="flex h-full flex-col">
+          {/* Header */}
+          <div className="flex h-16 items-center border-b px-6">
+            <h2 className="text-lg font-semibold">Teacher Dashboard</h2>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 space-y-1 p-4">
+            {routes.map((route) => (
+              <Link
+                key={route.href}
+                href={route.href}
+                onClick={() => setIsOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                  route.active
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-muted text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <route.icon className="h-4 w-4" />
+                {route.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Footer */}
+          <div className="border-t p-4">
+            <LogoutButton className="w-full" />
+          </div>
+        </div>
       </div>
-      <nav className="flex-1 overflow-auto py-4">
-        <div className="px-4 py-2">
-          <h2 className="mb-2 text-xs font-semibold text-gray-500">TEACHING</h2>
-          <div className="space-y-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
-                  isActive(item.href) && (!item.exact || pathname === item.href)
-                    ? "bg-primary/10 text-primary"
-                    : "text-gray-500 hover:text-gray-900"
-                }`}
-              >
-                <item.icon className="h-4 w-4" />
-                {item.title}
-              </Link>
-            ))}
-          </div>
-        </div>
-        <div className="px-4 py-2">
-          <h2 className="mb-2 text-xs font-semibold text-gray-500">ACCOUNT</h2>
-          <div className="space-y-1">
-            {accountItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
-                  isActive(item.href) ? "bg-primary/10 text-primary" : "text-gray-500 hover:text-gray-900"
-                }`}
-              >
-                <item.icon className="h-4 w-4" />
-                {item.title}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </nav>
-    </aside>
+    </>
   )
 }
-

@@ -1,4 +1,4 @@
-import { CourseLevel, FeedbackType, PlanStatus, PrismaClient } from "@prisma/client"
+import { PrismaClient } from "@prisma/client"
 import { randomUUID } from "crypto"
 
 // Initialize Prisma Client
@@ -318,7 +318,7 @@ async function seedStudentFeedback(studentId: string, teacherId: string) {
       student_id: studentId,
       teacher_id: teacherId,
       content: "I really enjoyed the interactive exercises in today's lesson.",
-      feedback_type: FeedbackType.POSITIVE,
+      feedback_type: "POSITIVE",
       created_at: new Date(),
     },
     {
@@ -326,7 +326,7 @@ async function seedStudentFeedback(studentId: string, teacherId: string) {
       student_id: studentId,
       teacher_id: teacherId,
       content: "Could we spend more time on the difficult concepts?",
-      feedback_type: FeedbackType.SUGGESTION,
+      feedback_type: "SUGGESTION",
       created_at: new Date(),
     },
   ]
@@ -418,17 +418,14 @@ async function seedTeachingActivities(teacherId: string) {
   return createdActivities
 }
 
-
 // Seed learning plan
 async function seedLearningPlan(teacherId: string, subjectId: string) {
-
-  
   const plan = {
     id: randomUUID(),
     title: "Personalized Math Learning Plan",
     description: "A customized plan to improve mathematics skills",
     subject_id: subjectId,
-    level: CourseLevel.INTERMEDIATE,
+    level: "INTERMEDIATE",
     duration: "8 weeks",
     content: "This plan focuses on strengthening algebra and geometry skills.",
     is_template: false,
@@ -447,7 +444,7 @@ async function seedLearningPlan(teacherId: string, subjectId: string) {
 
     if (!existing) {
       const created = await prisma.learningPlan.create({
-        data: plan
+        data: plan,
       })
       console.log(`Created learning plan: ${created.title}`)
       return created
@@ -526,7 +523,7 @@ async function seedPlanAssignment(planId: string, studentId: string, teacherId: 
     plan_id: planId,
     user_id: studentId,
     assigned_by: teacherId,
-    status: PlanStatus.ASSIGNED,
+    status: "ASSIGNED",
     assigned_at: new Date(),
     start_date: new Date(),
     end_date: new Date(new Date().setMonth(new Date().getMonth() + 2)),

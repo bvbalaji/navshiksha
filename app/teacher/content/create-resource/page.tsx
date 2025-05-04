@@ -1,5 +1,5 @@
 import { ResourceForm } from "@/components/teacher/content/resource-form"
-import { requireRole } from "@/lib/auth-utils"
+import { requireRole } from "@/lib/auth/auth"
 
 export default async function CreateResourcePage() {
   const session = await requireRole(["TEACHER", "ADMIN"])
