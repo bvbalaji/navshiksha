@@ -5,3 +5,5 @@ Teachers can refine their content by taking inputs from AI tools
 Admin personell can manage the overall functions in the application
 
 The application is built on Nextjs, Postgress, React and Vercel stack.
+
+The UI is SSR based.
