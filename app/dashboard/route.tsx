@@ -5,9 +5,9 @@ import { cookies, headers } from "next/headers"
 export async function GET(request: Request) {
   // Get the token from the request
   const req = {
-    headers: Object.fromEntries(headers()),
+    headers: Object.fromEntries(await headers()),
     cookies: Object.fromEntries(
-      cookies()
+      (await cookies())
         .getAll()
         .map((c) => [c.name, c.value]),
     ),
