@@ -35,17 +35,38 @@ export async function POST(request: NextRequest) {
     const baseUrl = process.env.NEXTAUTH_URL || request.headers.get("origin") || ""
     const signOutUrl = `${baseUrl}/api/auth/signout`
 
-    // Return a simple success response
-    NextResponse.json({ success: true })
-    return NextResponse.redirect(signOutUrl)
+    // Return JSON response instead of redirect to break the loop
+   return NextResponse.json({ success: true, url: callbackUrl })
   } catch (error) {
     console.error("Sign out error:", error)
     return NextResponse.json({ success: false, error: "Failed to sign out" }, { status: 500 })
-
-  
-
-  
-
- 
+   }
 }
+
+
+// Also handle GET requests for compatibility
+export async function GET(request: Request) {
+  const url = new URL(request.url)
+  const callbackUrl = url.searchParams.get("callbackUrl") || "/"
+
+  // Return the HTML page that NextAuth expects
+  return new NextResponse(
+    `<!DOCTYPE html>
+    <html>
+      <head>
+        <meta http-equiv="refresh" content="0;url=${callbackUrl}">
+      </head>
+      <body>
+        Signing out...
+        <script>
+          window.location.href = "${callbackUrl}";
+        </script>
+      </body>
+    </html>`,
+    {
+      headers: {
+        "Content-Type": "text/html",
+      },
+    },
+  )
 }

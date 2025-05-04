@@ -6,8 +6,8 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   try {
-    // Check if the request is for the sign-out endpoint
-    if (pathname.startsWith("/api/auth/signout")) {
+    // Skip middleware for sign-out routes to prevent redirect loops
+    if (pathname.startsWith("/api/auth/signout") || pathname.startsWith("/api/auth/login")) {
       return NextResponse.next()
     }
 

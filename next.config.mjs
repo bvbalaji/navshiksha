@@ -1,5 +1,7 @@
-const HtmlWebpackPlugin = require("html-webpack-plugin")
-const path = require("path")
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import path from "path"
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -19,6 +21,22 @@ const nextConfig = {
       },
     ],
   },
+
+  
+  // Add this to help with proxy issues
+  headers: async () => {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Forwarded-Proto',
+            value: 'https',
+          },
+        ],
+      },
+    ]
+  },
   // Updated: moved from experimental.serverComponentsExternalPackages to serverExternalPackages
   serverExternalPackages: ["nock", "canvas", "sqlite3", "sharp", "@prisma/client", ".prisma/client"],
   webpack: (config, { isServer, dev }) => {
@@ -31,7 +49,7 @@ const nextConfig = {
       buffer: false,
       util: false,
       // Replace punycode with our polyfill
-      punycode: path.resolve(__dirname, "lib/polyfills/punycode-polyfill.js"),
+      punycode: path.resolve(path.join( __dirname, "lib/polyfills/punycode-polyfill.js")),
       "mock-aws-s3": false,
       "aws-sdk": false,
       nock: false,
@@ -121,4 +139,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+export default nextConfig
