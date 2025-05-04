@@ -6,6 +6,11 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   try {
+    // Check if the request is for the sign-out endpoint
+    if (pathname.startsWith("/api/auth/signout")) {
+      return NextResponse.next()
+    }
+
     // Get the token using next-auth/jwt
     const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
     const isAuthenticated = !!token

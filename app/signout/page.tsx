@@ -11,7 +11,7 @@ export default function SignOutPage() {
     const performSignOut = async () => {
       try {
         // Use redirect: true to avoid JSON parsing issues
-        await signOut({ redirect: true })
+        await signOut({ redirect: false })
 
         // Manually redirect after sign out
         router.push("/")

@@ -1,23 +1,37 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
+import { useState } from "react"
 
 interface LogoutButtonProps {
+  callbackUrl?: string
   className?: string
 }
 
-export function LogoutButton({ className }: LogoutButtonProps) {
-  const router = useRouter()
+export function LogoutButton({ callbackUrl = "/", className }: LogoutButtonProps) {
+  const [isSigningOut, setIsSigningOut] = useState(false)
 
-  const handleSignOut = () => {
-    // Navigate to our custom sign-out page
-    router.push("/signout")
+  const handleSignOut = async () => {
+    setIsSigningOut(true)
+    try {
+      await signOut({
+        callbackUrl,
+        redirect: true,
+      })
+    } catch (error) {
+      console.error("Sign out error:", error)
+      // Fallback redirect if client-side signOut fails
+      window.location.href = callbackUrl
+    } finally {
+      setIsSigningOut(false)
+    }
   }
 
   return (
-    <Button variant="ghost" className={className} onClick={handleSignOut}>
-      Logout
+    <Button onClick={handleSignOut} disabled={isSigningOut} className={className} variant="outline">
+      {isSigningOut ? "Signing out..." : "Sign out"}
     </Button>
   )
 }
+
