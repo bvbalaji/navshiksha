@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Brain } from "lucide-react"
+import { jwtVerify } from "jose"
+import Cookies from "js-cookie"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -44,26 +46,38 @@ export default function LoginPage() {
         setError(result.error === "CredentialsSignin" ? "Invalid email or password" : result.error)
         setIsLoading(false)
       } else {
-        // Get the user's role from the session
-        const session = await fetch("/api/auth/session").then((res) => res.json())
-        const userRole = session?.user?.role || "STUDENT"
+        // Get the user's role from the session, Try to extract from JWT token
+     
+          let userRole = undefined;
+          const token =
+            Cookies.get("next-auth.session-token") || Cookies.get("__Secure-next-auth.session-token")
 
-        if (userRole === "TEACHER") {
-          router.push("/teacher")
-        } else if (userRole === "ADMIN") {
-          router.push("/admin")
-        } else {
-          // Use the callback URL or default to dashboard
-          // student
-          router.push("/student")
+          if (token) {
+            const secret = new TextEncoder().encode(process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET)
+            const { payload } = await jwtVerify(token, secret)
+
+            if (payload && typeof payload === "object" && "role" in payload) {
+              userRole = payload.role 
+            }
+          }
+
+          if (userRole === "TEACHER") {
+            router.push("/teacher")
+          } else if (userRole === "ADMIN") {
+            router.push("/admin")
+          } else {
+            // Use the callback URL or default to dashboard
+            // student
+            router.push("/student")
+          }
         }
+      } catch (error) {
+        console.error("Login error:", error)
+        setError("An unexpected error occurred. Please try again.")
+        setIsLoading(false)
       }
-    } catch (error) {
-      console.error("Login error:", error)
-      setError("An unexpected error occurred. Please try again.")
-      setIsLoading(false)
     }
-  }
+  
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 py-12 sm:px-6 lg:px-8">

@@ -2,7 +2,7 @@
   "name": "navshiksha",
   "version": "0.1.0",
   "private": true,
-  "type": "module", 
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "npx prisma generate && next build",
@@ -60,6 +60,8 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",
+    "jose": "^6.0.11",
+    "js-cookie": "^3.0.5",
     "lucide-react": "^0.331.0",
     "next": "15.3.1",
     "next-auth": "4.24.11",
@@ -80,8 +82,9 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/node": "^20.11.0",
+    "@types/js-cookie": "^3.0.6",
     "@types/nock": "^11.1.0",
+    "@types/node": "^20.11.0",
     "@types/react": "^18.2.47",
     "@types/react-dom": "^18.2.18",
     "@types/recharts": "^2.0.0",
