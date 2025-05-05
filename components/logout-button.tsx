@@ -14,7 +14,7 @@ export function LogoutButton({ redirectTo = "/", className, children = "Log out"
   const handleLogout = async () => {
     // Use a direct navigation to our custom logout endpoint
     // window.location.href = `/api/auth/signout?redirectTo=${encodeURIComponent(redirectTo)}`
-    const logoutResponse = await fetch( `/api/auth/signout`, {
+    const response = await fetch( `/api/auth/signout`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -23,6 +23,10 @@ export function LogoutButton({ redirectTo = "/", className, children = "Log out"
         callbackUrl: encodeURIComponent(redirectTo)
       })
     })
+
+    if(response?.ok){
+      window.location.href = redirectTo
+    }
    
   }
 
