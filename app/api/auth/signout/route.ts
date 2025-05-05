@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
+import { clearAuthCookies } from "@/lib/auth/auth-utils"
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
@@ -37,6 +38,8 @@ export async function POST(request: Request) {
         (await cookies()).delete(cookie.name)
       }
     })
+    console.log(cookieStore, 'ÁAAAAAAAAAAAAAAAAAA')
+    await clearAuthCookies()
 
     return NextResponse.json({
       success: true,

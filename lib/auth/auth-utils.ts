@@ -1,4 +1,4 @@
-import { cookies, type UnsafeUnwrappedCookies } from "next/headers";
+import { cookies } from "next/headers";
 
 export async function clearAuthCookies() {
   const cookieStore = await cookies()
@@ -7,13 +7,13 @@ export async function clearAuthCookies() {
   const allCookies = cookieStore.getAll()
 
   // Clear all auth-related cookies
-  allCookies.forEach((cookie) => {
+  allCookies.forEach(async(cookie) => {
     if (
       cookie.name.includes("next-auth") ||
       cookie.name.includes("__Secure-next-auth") ||
       cookie.name.includes("__Host-next-auth")
     ) {
-      (cookies() as unknown as UnsafeUnwrappedCookies).delete(cookie.name)
+      (await cookies()).delete(cookie.name)
     }
   })
 }
