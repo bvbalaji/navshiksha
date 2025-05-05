@@ -6,6 +6,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
+  Brain,
   BookOpen,
   Calendar,
   ChevronDown,
@@ -166,7 +167,7 @@ export function StudentSidebar() {
       <div className="flex h-full flex-col gap-2">
         <div className="flex h-14 items-center border-b px-4">
           <Link href="/student" className="flex items-center gap-2 font-semibold">
-            <GraduationCap className="h-6 w-6" />
+            <Brain className="h-6 w-6" />
             <span>Student Portal</span>
           </Link>
         </div>
