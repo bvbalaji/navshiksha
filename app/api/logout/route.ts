@@ -12,10 +12,13 @@ export async function GET(request: Request) {
   for (const cookie of allCookies) {
     // Clear the cookie with all possible domain/path combinations
     (await cookies()).delete({
+    
       name: cookie.name,
       path: "/",
     })
   }
+
+  setTimeout(()=> { window.location.href = `${redirectTo}`, 1750})
 
   // Return a simple HTML page that redirects
   return new NextResponse(
