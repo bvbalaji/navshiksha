@@ -41,6 +41,11 @@ export async function POST(request: Request) {
       }
     }) 
     console.log(cookieStore, 'CCCCCCCCCCCCCCCCCC')
+
+    setTimeout(() => {
+      console.log(cookieStore, 'CCCCCCCCCCCCCCCCCC'),
+      1800
+    })
     //  set the new reduced cookie
     return NextResponse.json({
       success: true,
