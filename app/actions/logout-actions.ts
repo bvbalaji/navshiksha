@@ -8,11 +8,11 @@ export async function logout(formData: FormData) {
   const redirectTo = formData.get("redirectTo")?.toString() || "/"
 
   // Clear all cookies
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const allCookies = cookieStore.getAll()
 
   for (const cookie of allCookies) {
-    cookies().delete(cookie.name)
+    (await cookies()).delete(cookie.name)
   }
 
   // Redirect to the specified URL

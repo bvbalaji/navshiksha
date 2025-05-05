@@ -45,7 +45,8 @@ async function getClassDetails(classId: string, teacherId: string) {
   return classDetails
 }
 
-export default async function ClassDetailPage({ params }: { params: { id: string } }) {
+export default async function ClassDetailPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await requireRole(["TEACHER", "ADMIN"])
   const teacherId = session.user.id
   const classId = params.id

@@ -23,7 +23,8 @@ async function getCourse(id: string, userId: string) {
   return course
 }
 
-export default async function EditCourseDetailsPage({ params }: { params: { id: string } }) {
+export default async function EditCourseDetailsPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await requireRole(["TEACHER", "ADMIN"])
   const [subjects, course] = await Promise.all([getSubjects(), getCourse(params.id, session.user.id)])
 

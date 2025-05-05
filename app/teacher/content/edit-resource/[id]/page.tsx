@@ -17,7 +17,8 @@ async function getResource(id: string, userId: string) {
   return resource
 }
 
-export default async function EditResourcePage({ params }: { params: { id: string } }) {
+export default async function EditResourcePage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await requireRole(["TEACHER", "ADMIN"])
   const resource = await getResource(params.id, session.user.id)
 

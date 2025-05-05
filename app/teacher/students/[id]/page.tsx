@@ -121,7 +121,8 @@ async function getTeacherNotes(teacherId: string, studentId: string) {
   })
 }
 
-export default async function StudentPage({ params }: { params: { id: string } }) {
+export default async function StudentPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await requireRole(["TEACHER", "ADMIN"])
   const teacherId = session.user.id
 

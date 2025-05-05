@@ -3,17 +3,17 @@ import { cookies } from "next/headers"
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
-  const callbackUrl = await url.searchParams.get("callbackUrl") || "/"
+  const callbackUrl = (await url.searchParams.get("callbackUrl")) || "/"
 
   // Clear all auth-related cookies
   const cookieStore = await cookies()
-  cookieStore.getAll().forEach((cookie) => {
+  cookieStore.getAll().forEach(async cookie => {
     if (
       cookie.name.includes("next-auth") ||
       cookie.name.includes("__Secure-next-auth") ||
       cookie.name.includes("__Host-next-auth")
     ) {
-      cookies().delete(cookie.name)
+      (await cookies()).delete(cookie.name)
     }
   })
 
@@ -28,13 +28,13 @@ export async function POST(request: Request) {
 
     // Clear all auth-related cookies
     const cookieStore = await cookies()
-    cookieStore.getAll().forEach((cookie) => {
+    cookieStore.getAll().forEach(async cookie => {
       if (
         cookie.name.includes("next-auth") ||
         cookie.name.includes("__Secure-next-auth") ||
         cookie.name.includes("__Host-next-auth")
       ) {
-        cookies().delete(cookie.name)
+        (await cookies()).delete(cookie.name)
       }
     })
 

@@ -6,12 +6,12 @@ export async function GET(request: Request) {
   const redirectTo = url.searchParams.get("redirectTo") || "/"
 
   // Clear all cookies - this is a brute force approach
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const allCookies = cookieStore.getAll()
 
   for (const cookie of allCookies) {
     // Clear the cookie with all possible domain/path combinations
-    cookies().delete({
+    (await cookies()).delete({
       name: cookie.name,
       path: "/",
     })

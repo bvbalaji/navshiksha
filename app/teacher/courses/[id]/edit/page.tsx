@@ -8,11 +8,12 @@ export const metadata = {
   description: "Edit your course details",
 }
 
-export default async function EditCoursePage({
-  params,
-}: {
-  params: { id: string }
-}) {
+export default async function EditCoursePage(
+  props: {
+    params: Promise<{ id: string }>
+  }
+) {
+  const params = await props.params;
   const [course, subjects] = await Promise.all([getCourseById(params.id), getSubjects()])
 
   if (!course) {

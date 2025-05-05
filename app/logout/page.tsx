@@ -1,17 +1,18 @@
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
-export default function LogoutPage({
-  searchParams,
-}: {
-  searchParams: { redirectTo?: string }
-}) {
+export default async function LogoutPage(
+  props: {
+    searchParams: Promise<{ redirectTo?: string }>
+  }
+) {
+  const searchParams = await props.searchParams;
   // Clear all cookies server-side
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const allCookies = cookieStore.getAll()
 
   for (const cookie of allCookies) {
-    cookies().delete(cookie.name)
+    (await cookies()).delete(cookie.name)
   }
 
   // Get the redirect URL or default to home

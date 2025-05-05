@@ -27,7 +27,8 @@ async function getCourseWithModulesAndLessons(id: string, userId: string) {
   return course
 }
 
-export default async function EditCoursePage({ params }: { params: { id: string } }) {
+export default async function EditCoursePage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await requireRole(["TEACHER", "ADMIN"])
   const course = await getCourseWithModulesAndLessons(params.id, session.user.id)
 

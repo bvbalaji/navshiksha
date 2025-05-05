@@ -10,11 +10,12 @@ export const metadata = {
   description: "View and manage course details, modules, and lessons",
 }
 
-export default async function CourseDetailsPage({
-  params,
-}: {
-  params: { id: string }
-}) {
+export default async function CourseDetailsPage(
+  props: {
+    params: Promise<{ id: string }>
+  }
+) {
+  const params = await props.params;
   const course = await getCourseById(params.id)
 
   if (!course) {
