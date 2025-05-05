@@ -29,18 +29,19 @@ export async function POST(request: Request) {
 
     // Clear all auth-related cookies
     const cookieStore = await cookies()
+    
+    let newCookieStore = cookieStore;
     cookieStore.getAll().forEach(async cookie => {
       if (
         cookie.name.includes("next-auth") ||
         cookie.name.includes("__Secure-next-auth") ||
         cookie.name.includes("__Host-next-auth")
       ) {
-        (await cookies()).delete(cookie.name)
+        cookieStore.set(cookie.name, '', {maxAge: 0})
       }
-    })
-    console.log(cookieStore, 'ÁAAAAAAAAAAAAAAAAAA')
-    await clearAuthCookies()
-
+    }) 
+    console.log(cookieStore, 'CCCCCCCCCCCCCCCCCC')
+    //  set the new reduced cookie
     return NextResponse.json({
       success: true,
       message: "Signed out successfully",
