@@ -73,7 +73,7 @@ const navItems: NavItem[] = [
   },
   {
     title: "Tutoring",
-    href: "/student/tutoring",
+    href: "/student/tutor",
     icon: <GraduationCap className="h-5 w-5" />,
   },
   {
