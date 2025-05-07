@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { SessionProvider, useSession } from "next-auth/react"
 import Link from "next/link"
 import { Bell, Search, User, LogOut, Settings, HelpCircle, GraduationCap } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -9,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -16,6 +18,7 @@ import { StudentMobileNav } from "./student-sidebar"
 import { LogoutButton } from "@/components/logout-button"
 
 export function StudentHeader() {
+  const { data: session } = useSession()
   const [notifications, setNotifications] = useState(3)
 
   return (
@@ -42,7 +45,7 @@ export function StudentHeader() {
           )}
           <span className="sr-only">Notifications</span>
         </Button>
-
+        <SessionProvider session={session}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon" className="rounded-full">
@@ -55,10 +58,7 @@ export function StudentHeader() {
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
                 <User className="h-5 w-5" />
               </div>
-              <div className="flex flex-col space-y-0.5">
-                <p className="text-sm font-medium">Alex Johnson</p>
-                <p className="text-xs text-muted-foreground">alex.j@example.com</p>
-              </div>
+              <DropdownMenuLabel>{session?.user?.name || "Teacher"}</DropdownMenuLabel>
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
@@ -85,6 +85,7 @@ export function StudentHeader() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        </SessionProvider>
       </div>
     </header>
   )

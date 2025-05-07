@@ -6,8 +6,8 @@ import { SessionProvider } from "next-auth/react"
 import { Session } from 'next-auth'
 
 interface Props {
-  session: Session | null
-  children: React.ReactNode
+  session?: Session | null
+  children?: React.ReactNode
 }
 
 export function AuthProvider({ children , session}: Props) {
